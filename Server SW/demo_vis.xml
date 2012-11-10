@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<visualization>
+
+	<room>
+		<pos>
+			<x>0</x>
+			<y>41</y>
+		</pos>
+		<img>img/Raumle.png</img>
+	</room>
+
+	<light>
+		<img>
+			<on>img/licht_on.jpg</on>
+			<off>img/licht_off.jpg</off>
+		</img>
+	</light>
+
+	<__Raumle__Hauptlicht1>
+		<pos>
+			<x>100</x>
+			<y>100</y>
+		</pos>
+	</__Raumle__Hauptlicht1>
+
+	<__Raumle__Hauptlicht2>
+		<pos>
+			<x>200</x>
+			<y>100</y>
+		</pos>
+	</__Raumle__Hauptlicht2>
+
+	<__Raumle__Hauptlicht3>
+		<pos>
+			<x>300</x>
+			<y>100</y>
+		</pos>
+	</__Raumle__Hauptlicht3>
+
+	<__Raumle__Barlicht1>
+		<pos>
+			<x>50</x>
+			<y>50</y>
+		</pos>
+	</__Raumle__Barlicht1>
+
+	<__Raumle__Barlicht2>
+		<pos>
+			<x>50</x>
+			<y>150</y>
+		</pos>
+	</__Raumle__Barlicht2>
+
+
+</visualization>

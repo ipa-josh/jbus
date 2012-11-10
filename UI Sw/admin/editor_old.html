@@ -1,0 +1,323 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>jQuery SVG Basics</title>
+<style type="text/css">
+@import "jquery.svg.css";
+@import "style.css";
+
+
+/* 2.1 =Splitter
+---------------------------------------------------------------------- */
+
+
+.splitter {
+  margin: 40px -40px;
+  text-align: center;
+  background: #35393c url("i/splitter.png") repeat-x 0 100%;
+  border-bottom: 1px solid #1d1f21;
+  padding: 6px 40px 5px;
+  font-size: 12px;
+}
+
+.splitter:after {
+  content: "";
+  display: block;
+  height: 0;
+  overflow: hidden;
+  clear: both;
+}
+
+.splitter fieldset {
+  margin-right: 0;
+  margin-top: 0;
+}
+
+.splitter > legend {
+  padding-left: 8px;
+}
+
+.splitter input {
+  border-bottom: 0;
+  position: static;
+}
+
+.splitter input  {
+  display: inline;
+  display: inline-block;
+  line-height: 1;
+}
+
+.splitter input {
+  padding: 5px 8px 6px;
+  color: #070708;
+  text-shadow: rgba(255, 255, 255, 0.1) 0 1px 0;
+  text-decoration: none;
+}
+
+.splitter input:checked {
+  color: #fff;
+  text-shadow: rgba(0, 0, 0, 0.25) 0 1px 0;
+}
+
+
+/* 3.2 =Image Grid
+---------------------------------------------------------------------- */
+.image-grid {
+  margin: -10px 0 0 -40px;
+  padding-left: 5px;
+  width: 100%;
+}
+
+.image-grid:after {
+  content: "";
+  display: block;
+  height: 0;
+  overflow: hidden;
+  clear: both;
+}
+
+.image-grid li {
+  height: 100px;
+  margin: 10px 0 0 35px;
+  float: left;
+  text-align: center;
+  font-family: "Helvetica Neue", sans-serif;
+  line-height: 17px;
+  color: #686f74;
+  overflow: hidden;
+}
+
+.image-grid li img,
+.image-grid li strong {
+  display: block;
+}
+
+.image-grid li strong {
+  color: #fff;
+}
+
+#editorwindow { width: 400px; height: 300px; border: 3px solid #555; }
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="jquery.svg.js"></script>
+<script type="text/javascript" src="jquery.quicksand.js"></script>
+<script type="text/javascript" src="jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="jquery.jsPlumb-1.3.9-all-min.js"></script>
+
+<script type="text/javascript">
+var handler_list = new Array();
+
+function add_handler(h) {
+	handler_list.push(h);
+  }
+</script>
+
+<script type="text/javascript" src="editor/line.js"></script>
+<script type="text/javascript" src="editor/svgs.js"></script>
+<script type="text/javascript" src="editor/lamp.js"></script>
+<script type="text/javascript" src="editor/switch.js"></script>
+<script type="text/javascript">
+$(function() {
+	$('#editorwindow').svg({onLoad: drawInitial});
+	$('#rect,#line,#circle,#ellipse').click(drawShape);
+	$('#clear').click(function() {
+		$('#editorwindow').svg('get').clear();
+		drawInitial($('#editorwindow').svg('get'));
+	});
+	$('#export').click(function() {
+		var xml = $('#editorwindow').svg('get').toSVG();
+		$('#svgexport').html(xml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+	});
+	
+	for(var i=0; i<handler_list.length; i++) {
+		var h = handler_list[i];
+		
+	$("#applications").append('<li data-id="tools_'+h.name+'" id="tools_'+h.name+'" data-type="'+h.type+'">'+
+    '<img src="'+h.icon+'" height="64" alt="" />'+
+    '<strong>'+h.descr+'</strong>  </li>');
+	
+	  $("#tools_"+h.name).data('handler',h).click( function() {
+		if(mouse_handler) mouse_handler.break();
+		mouse_handler = $(this).data('handler');
+	  });
+	 }
+});
+
+var obj_id=0;
+var mouse_handler = 0;
+
+function toGrid(x)
+{
+	return Math.round(x/20.)*20;
+}
+
+function editor_mousemove(e)
+{
+    var x = e.pageX - this.offsetLeft;
+    var y = e.pageY - this.offsetTop;
+	x = toGrid(x);
+	y = toGrid(y);
+	if(mouse_handler)
+		mouse_handler.move(x,y);
+}
+
+function editor_mouseclick(e)
+{
+    var x = e.pageX - this.offsetLeft;
+    var y = e.pageY - this.offsetTop;
+	x = toGrid(x);
+	y = toGrid(y);
+	if(mouse_handler)
+	{
+		if(e.which==1)
+			mouse_handler.click(x,y);
+		else if(e.which==2)
+		{
+			mouse_handler.break(x,y);
+			mouse_handler.move(x,y);
+		}
+	}
+	return false;
+}
+
+function drawInitial(svg) {
+    svg.load('<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"> <defs> <pattern id="gridPattern" width="20" height="20" patternUnits="userSpaceOnUse"> <rect x="0" y="0" width="20" height="20" fill="#666666" style="stroke:#999999;stroke-width:2;"/> </pattern> </defs> <g transform="translate(0,0)"> <rect fill="url(#gridPattern)" x="0" y="0" width="100%" height="100%"/> </g> </svg> ',
+		{changeSize: false});
+	$('#editorwindow').mousemove(editor_mousemove);
+	$('#editorwindow').click(editor_mouseclick);
+	$('#editorwindow').bind("contextmenu",function(e){
+		e.which=2;
+		editor_mouseclick(e);
+		return false;
+	}); 
+}
+
+var colours = ['purple', 'red', 'orange', 'yellow', 'lime', 'green', 'blue', 'navy', 'black'];
+
+function drawShape() {
+	var shape = this.id;
+	var svg = $('#editorwindow').svg('get');
+	if (shape == 'rect') {
+		svg.rect(random(300), random(200), random(100) + 100, random(100) + 100,
+			{fill: colours[random(9)], stroke: colours[random(9)],
+			'stroke-width': random(5) + 1});
+	}
+	else if (shape == 'line') {
+		svg.line(random(400), random(300), random(400), random(300),
+			{stroke: colours[random(9)], 'stroke-width': random(5) + 1});
+	}
+	else if (shape == 'circle') {
+		svg.circle(random(300) + 50, random(200) + 50, random(80) + 20,
+			{fill: colours[random(9)], stroke: colours[random(9)],
+			'stroke-width': random(5) + 1});
+	}
+	else if (shape == 'ellipse') {
+		svg.ellipse(random(300) + 50, random(200) + 50, random(80) + 20, random(80) + 20,
+			{fill: colours[random(9)], stroke: colours[random(9)],
+			'stroke-width': random(5) + 1});
+	}
+}
+
+function random(range) {
+	return Math.floor(Math.random() * range);
+}
+
+// Custom sorting plugin
+(function($) {
+  $.fn.sorted = function(customOptions) {
+    var options = {
+      reversed: false,
+      by: function(a) { return a.text(); }
+    };
+    $.extend(options, customOptions);
+    $data = $(this);
+    arr = $data.get();
+    arr.sort(function(a, b) {
+      var valA = options.by($(a));
+      var valB = options.by($(b));
+      if (options.reversed) {
+        return (valA < valB) ? 1 : (valA > valB) ? -1 : 0;				
+      } else {		
+        return (valA < valB) ? -1 : (valA > valB) ? 1 : 0;	
+      }
+    });
+    return $(arr);
+  };
+})(jQuery);
+
+// DOMContentLoaded
+$(function() {
+
+  // bind radiobuttons in the form
+  var $filterType = $('#filter input[name="type"]');
+  var $filterSort = $('#filter input[name="sort"]');
+
+  // get the first collection
+  var $applications = $('#applications');
+
+  // clone applications to get a second collection
+  var $data = $applications.clone();
+
+  // attempt to call Quicksand on every form change
+  $filterType.add($filterSort).change(function(e) {
+    if ($($filterType+':checked').val() == 'all') {
+      var $filteredData = $data.find('li');
+    } else {
+      var $filteredData = $data.find('li[data-type=' + $($filterType+":checked").val() + ']');
+    }
+
+      // if sorted by name
+      var $sortedData = $filteredData.sorted({
+        by: function(v) {
+          return $(v).find('strong').text().toLowerCase();
+        }
+      });
+
+    // finally, call quicksand
+    $applications.quicksand($sortedData, {
+      duration: 800,
+      easing: 'easeInOutQuad'
+    });
+
+  });
+
+});
+</script>
+</head>
+<body>
+<h1 id="info">jQuery SVG Basics</h1>
+<p>This page demonstrates the very basics of the <a href="http://keith-wood.name/svg.html">jQuery SVG plugin</a>.
+	It contains the minimum requirements for using the plugin and
+	can be used as the basis for your own experimentation.</p>
+<p>The page creates an SVG document in the area below and draws an initial display.
+	The buttons then add randomly sized and coloured shapes on demand.</p>
+<p>For more detail see the <a href="http://keith-wood.name/svgRef.html">documentation reference</a> page.</p>
+
+<p id="tools">
+
+<form id="filter" class="splitter">
+  <fieldset>
+    <legend>Filter</legend>
+    <label><input type="radio" name="type" value="all" checked="checked">Alles</label>
+    <label><input type="radio" name="type" value="bg">Hintergrund</label>
+    <label><input type="radio" name="type" value="ia">Interaktionselemente</label>
+    <label><input type="radio" name="type" value="hw">Hardware</label>
+  </fieldset>
+</form>
+
+<ul id="applications" class="image-grid">
+</ul>
+
+</p>
+
+<div id="editorwindow"></div>
+
+
+<p><button id="rect">Add rectangle</button> <button id="line">Add line</button>
+	<button id="circle">Add circle</button> <button id="ellipse">Add ellipse</button>
+	<button id="clear">Clear</button> <button id="export">Export</button></p>
+<div id="svgexport"></div>
+</body>
+</html>

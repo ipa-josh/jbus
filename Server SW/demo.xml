@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HAObject id="house" visualization="house" port="8080" visxml="demo_vis.xml">
+
+	<HAObject id="Raumle" visualization="room">
+
+		<HAObject id="Hauptlicht1" visualization="light">
+			<Attr_Boolean id="status">0</Attr_Boolean>
+		</HAObject>
+
+		<HAObject id="Hauptlicht2" visualization="light">
+			<Attr_Boolean id="status">0</Attr_Boolean>
+		</HAObject>
+
+		<HAObject id="Hauptlicht3" visualization="light">
+			<Attr_Boolean id="status">0</Attr_Boolean>
+		</HAObject>
+
+		<HAObject id="Barlicht1" visualization="light">
+			<Attr_Boolean id="status">0</Attr_Boolean>
+		</HAObject>
+
+		<HAObject id="Barlicht2" visualization="light">
+			<Attr_Boolean id="status">0</Attr_Boolean>
+		</HAObject>
+		
+		
+		<connection a="Hauptlicht1/status" b="board1/out1" />
+
+
+		<connection a="Hauptlicht2/status" b="board1/out2" />
+
+		<connection a="Hauptlicht3/status" b="board1/out3" />
+
+		<connection a="Hauptlicht1/status" b="board1/in1" type="AttrConv_Button"/>
+
+		<connection a="Hauptlicht2/status" b="board1/in1" type="AttrConv_Button"/>
+
+		<connection a="Hauptlicht3/status" b="board1/in1" type="AttrConv_Button"/>
+
+		<connection a="Barlicht1/status" b="board1/out4" />
+
+		<connection a="Barlicht2/status" b="board1/out5" />
+
+		<connection a="Barlicht1/status" b="board1/in2" type="AttrConv_Button"/>
+
+		<connection a="Barlicht2/status" b="board1/in3" type="AttrConv_Button"/>
+
+	</HAObject>
+
+</HAObject>

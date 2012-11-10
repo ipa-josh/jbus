@@ -1,0 +1,32 @@
+.progressbar {
+ width: 25px;
+ height: 215px;
+ position: relative;
+ background: url(../img/thermo/box.png) no-repeat scroll 0pt 0pt transparent;
+} 
+.progressbar-value {
+font-family: Segoe UI,Arial,sans-serif;
+ position: absolute;
+ display: block;
+ margin: 0;
+ border: 0;
+ width: 15px;
+ height: 200px;
+ top: 7px;
+ left: 5px;
+ overflow: hidden;
+ text-indent: -30px;
+ background: url(../img/thermo/bg.png) repeat scroll center center #0f0;
+}
+.progressbar-cover {
+ position: absolute;
+ display: block;
+ width: 15px;
+ height: 200px;
+ border: 0;
+ left: 0;
+ bottom: 0%;
+ background: url(../img/thermo/bg2.png) repeat-x scroll 0 0 transparent;
+}
+
+#slider { width: 200px; margin-left: 10px; }
