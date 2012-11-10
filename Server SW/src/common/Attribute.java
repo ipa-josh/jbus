@@ -16,6 +16,7 @@ public abstract class Attribute extends Right {
 
 	public Attribute(User usr, Group grp) {
 		super(usr, grp);
+		CallbackInst.addDefaultCallbacks(this);
 	}
 	public Object get(User usr) {
 		synchronized(this) {

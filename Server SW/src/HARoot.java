@@ -1,3 +1,5 @@
+import history.LogSqLite;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -14,6 +16,8 @@ import rights.User;
 import web.LookUp;
 import web.Setter;
 import web.VisJQuery;
+import web.VisUpdater;
+import common.CallbackInst;
 import common.HAObject;
 import common.Output;
 
@@ -25,6 +29,12 @@ public class HARoot extends HAObject {
 	}
 
 	public boolean _readXML(Element el) {
+		
+		VisUpdater visup = new VisUpdater();
+		
+		CallbackInst.addDefaultCallback(new LogSqLite(this, "./history.db"));
+		CallbackInst.addDefaultCallback(visup);
+		
 		boolean r = super._readXML(el);
 		
 		int port=8080;

@@ -12,7 +12,7 @@ import common.Path;
 import jibble.simplewebserver.SimpleWebServer.PathHandle;
 
 public class LookUp implements PathHandle {
-	Attribute root_ = null;
+	private Attribute root_ = null;
 	
 	public LookUp(Attribute root) {
 		root_ = root;

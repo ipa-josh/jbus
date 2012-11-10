@@ -13,7 +13,7 @@ import common.PathWithData;
 import jibble.simplewebserver.SimpleWebServer.PathHandle;
 
 public class Setter implements PathHandle {
-	Attribute root_ = null;
+	private Attribute root_ = null;
 	
 	public Setter(Attribute root) {
 		root_ = root;

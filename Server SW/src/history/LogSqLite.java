@@ -11,6 +11,7 @@ import HWDriver.AVRNETIO.AvrNetIo;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
+import com.almworks.sqlite4java.SQLiteStatement;
 
 import rights.Right;
 import rights.User;
@@ -19,11 +20,13 @@ import common.Attribute;
 import common.Callback;
 import common.HAObject;
 import common.Path;
+import common.PathWithData;
 
 import jibble.simplewebserver.SimpleWebServer.PathHandle;
 
 public class LogSqLite extends Thread implements Callback {
 	private SQLiteConnection db_ = null;
+	Attribute root_ = null;
 
 	private static class LogEntry {
 		Attribute attr;
@@ -32,7 +35,8 @@ public class LogSqLite extends Thread implements Callback {
 
 	private Vector<LogEntry> buffer_ = new Vector<LogEntry>();
 
-	public LogSqLite(String fn) {
+	public LogSqLite(Attribute root, String fn) {
+		root_ = root;
 		db_ = new SQLiteConnection(new File(fn));
 		try {
 			db_.open(true);
@@ -40,7 +44,7 @@ public class LogSqLite extends Thread implements Callback {
 		} catch (SQLiteException ex) {
 			Logger.getLogger(LogSqLite.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		
+
 		setPriority( Thread.MIN_PRIORITY );
 		start();
 	}
@@ -71,7 +75,7 @@ public class LogSqLite extends Thread implements Callback {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
 	@Override
 	public void run() {
 		while(true) {
@@ -81,7 +85,7 @@ public class LogSqLite extends Thread implements Callback {
 					buffer_.remove(0);
 				}
 			}
-			
+
 			try {
 				wait();
 			} catch (InterruptedException e) {
@@ -90,7 +94,22 @@ public class LogSqLite extends Thread implements Callback {
 				} catch (InterruptedException e1) {
 				}
 			}
-			
+
+		}
+	}
+
+	public void restore(rights.User user) {
+		SQLiteStatement st;
+		try {
+			st = db_.prepare("SELECT id, data FROM orders WHERE utime = Max(utime) GROUP BY id");
+			while(st.step()) {
+				PathWithData p = new PathWithData();
+				p.parseString(st.columnString(0));
+				p.setData(st.columnString(1));
+				root_.set(user, p);
+			}
+		} catch (SQLiteException ex) {
+			Logger.getLogger(LogSqLite.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
