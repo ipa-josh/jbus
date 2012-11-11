@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authentification>
+	<user>
+		<user>henning</user>
+		<password>a9993e364706816aba3e25717850c26c9cd0d89d</password>
+		<group>hw</group>
+	</user>
+	<user>
+		<user>josh</user>
+		<password>a9993e364706816aba3e25717850c26c9cd0d89d</password>
+		<group>ui</group>
+	</user>
+</authentification>
