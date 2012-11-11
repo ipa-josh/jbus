@@ -11,6 +11,8 @@ import HWDriver.AVRNETIO.AvrNetIo;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
+import com.almworks.sqlite4java.SQLiteJob;
+import com.almworks.sqlite4java.SQLiteQueue;
 import com.almworks.sqlite4java.SQLiteStatement;
 
 import rights.Right;
@@ -24,49 +26,42 @@ import common.PathWithData;
 
 import jibble.simplewebserver.SimpleWebServer.PathHandle;
 
-public class LogSqLite extends Thread implements Callback {
-	private SQLiteConnection db_ = null;
+public class LogSqLite implements Callback {
 	Attribute root_ = null;
-
-	private static class LogEntry {
-		Attribute attr;
-		Date utime = new Date();
-	}
-
-	private Vector<LogEntry> buffer_ = new Vector<LogEntry>();
+	SQLiteQueue queue_ = null;
 
 	public LogSqLite(Attribute root, String fn) {
 		root_ = root;
-		db_ = new SQLiteConnection(new File(fn));
-		try {
-			db_.open(true);
-			db_.exec("create table if not exists history (id TEXT PRIMARY KEY ASC, data TEXT, utime REAL)");
-		} catch (SQLiteException ex) {
-			Logger.getLogger(LogSqLite.class.getName()).log(Level.SEVERE, null, ex);
-		}
 
-		setPriority( Thread.MIN_PRIORITY );
-		start();
+		queue_ = new SQLiteQueue(new File(fn));
+		queue_.start();
+		queue_.execute(new SQLiteJob<Object>() {
+			protected Object job(SQLiteConnection connection) throws SQLiteException {
+				connection.exec("create table if not exists history (id TEXT, data TEXT, utime REAL)");
+				return null;
+			}
+		});
 	}
 
-	private void log(LogEntry e) {
+	private void log(final Attribute attr, final Date utime, final User usr) {
 		//YYYY-MM-DD HH:MM:SS.SSS
-		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		try {
-			db_.exec("INSERT INTO history ('"+e.attr.getId()+"','"+e.attr.toString()+"',julianday('"+fmt.format(e.utime)+"'))");
-		} catch (SQLiteException ex) {
-			Logger.getLogger(LogSqLite.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		queue_.execute(new SQLiteJob<Object>() {
+			protected Object job(SQLiteConnection connection) throws SQLiteException {
+				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+				//System.out.println("INSERT INTO history VALUES('"+attr.getAbsoluteId()+"','"+attr.get(usr)+"',julianday('"+fmt.format(utime)+"'))");
+				connection.exec("INSERT INTO history VALUES('"+attr.getAbsoluteId()+"','"+attr.get(usr)+"',julianday('"+fmt.format(utime)+"'))");
+				return null;
+			}
+		});
 	}
 
 	@Override
 	public boolean onAttributeChanged(Attribute attr) {
-		LogEntry e = new LogEntry();
-		e.attr = attr;
+		Date d = new Date();
 		synchronized(this) {
-			buffer_.add(e);
+			log(attr, d, Right.getGlobalUser("ui"));
+			notify();
 		}
-		notify();
 		return false;
 	}
 
@@ -76,38 +71,23 @@ public class LogSqLite extends Thread implements Callback {
 		return false;
 	}
 
-	@Override
-	public void run() {
-		while(true) {
-			synchronized (this) {
-				while( buffer_.size()>0 ) {
-					log(buffer_.get(0));
-					buffer_.remove(0);
-				}
-			}
-
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				try {
-					sleep(1000);
-				} catch (InterruptedException e1) {
-				}
-			}
-
-		}
-	}
-
 	public void restore(rights.User user) {
 		SQLiteStatement st;
 		try {
-			st = db_.prepare("SELECT id, data FROM orders WHERE utime = Max(utime) GROUP BY id");
+			SQLiteConnection db_ = new SQLiteConnection(queue_.getDatabaseFile());
+			try {
+				db_.open(false);
+			} catch (SQLiteException ex) {
+				Logger.getLogger(LogSqLite.class.getName()).log(Level.SEVERE, null, ex);
+			}
+			st = db_.prepare("SELECT id, data FROM history h WHERE utime = (select Max(utime) FROM history WHERE id=h.id)");
 			while(st.step()) {
 				PathWithData p = new PathWithData();
 				p.parseString(st.columnString(0));
 				p.setData(st.columnString(1));
 				root_.set(user, p);
 			}
+			db_.dispose();
 		} catch (SQLiteException ex) {
 			Logger.getLogger(LogSqLite.class.getName()).log(Level.SEVERE, null, ex);
 		}
