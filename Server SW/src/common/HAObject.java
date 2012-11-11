@@ -5,6 +5,7 @@ import interlayer.AttributeConversion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Calendar;
 import java.util.ServiceLoader;
 import java.util.Vector;
 
@@ -17,8 +18,8 @@ import rights.User;
 public class HAObject extends Attribute {
 	protected Vector<Attribute> list_ = new Vector<Attribute>();
 
-	public HAObject(User usr, Group grp) {
-		super(usr, grp);
+	public HAObject(User usr, Group grp, Attribute parent) {
+		super(usr, grp, parent);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -31,7 +32,13 @@ public class HAObject extends Attribute {
 		String s=pwd.popFront();
 		for(int i=0; i<list_.size(); i++)
 			if(list_.get(i).getId().equals(s))
-				return list_.get(i).set(usr, pwd.get());
+				if( list_.get(i).set(usr, pwd.get()) )
+				{
+					ts_change_=Calendar.getInstance().getTimeInMillis();
+					return true;
+				}
+				else
+					return false;
 		return false;
 	}
 
@@ -77,6 +84,13 @@ public class HAObject extends Attribute {
 		return null;
 	}
 
+	protected Vector<Attribute> _getUpdate(User usr, long ts) {
+		Vector<Attribute> l = new Vector<Attribute>();
+		for(int i=0; i<list_.size(); i++)
+			l.addAll( list_.get(i).getUpdate(usr, ts) );
+		return l;
+	}
+
 	public boolean _readXML(Element el) {
 		list_.clear();
 
@@ -92,8 +106,8 @@ public class HAObject extends Attribute {
 					if(sub.getName().equals(list[j].getSimpleName()) && Attribute.class.isAssignableFrom(list[j])) {
 
 						try {
-							Constructor<? extends Attribute> constructor = list[j].getConstructor(new Class[] {User.class, Group.class});
-							Attribute temp = constructor.newInstance(new Object[] {getUser(),getGroup()});
+							Constructor<? extends Attribute> constructor = list[j].getConstructor(new Class[] {User.class, Group.class, Attribute.class});
+							Attribute temp = constructor.newInstance(new Object[] {getUser(),getGroup(), this});
 
 							if(!temp.readXML(sub)) {
 								Output.error("Failed to load "+sub.getName());
@@ -183,7 +197,7 @@ public class HAObject extends Attribute {
 				}
 			}
 			else
-				Output.error("could not connect "+ta.getValue()+" and "+tb.getValue());
+				Output.error("could not connect "+ta.getValue()+" and "+tb.getValue() + " ("+(a==null?"0":"1")+(b==null?"0":"1")+")");
 		}
 
 		return true;

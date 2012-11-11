@@ -1,8 +1,6 @@
 package rights;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringBufferInputStream;
 import java.security.DigestInputStream;
@@ -11,16 +9,11 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 import common.Output;
-
-import HWDriver.AVRNETIO.AvrNetIo;
 
 public class Authentification implements jibble.simplewebserver.Authentification {
 	

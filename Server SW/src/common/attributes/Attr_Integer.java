@@ -11,8 +11,8 @@ import common.Attribute;
 public class Attr_Integer extends Attribute {
 	long val_;
 
-	public Attr_Integer(User usr, Group grp) {
-		super(usr, grp);
+	public Attr_Integer(User usr, Group grp, Attribute parent) {
+		super(usr, grp, parent);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -68,8 +68,6 @@ public class Right {
 	}
 
 	public boolean readXML(Element el) {
-		org.jdom2.Attribute t; //TODO: 
-		
 		owner_ = new User(el.getAttribute("user").getValue());
 		group_ = new Group(el.getAttribute("group").getValue());
 		int r=Integer.parseInt(el.getAttribute("rights").getValue());
@@ -87,6 +85,7 @@ public class Right {
 			users_.add(new User("interlayer"));
 			users_.add(new User("ui"));
 			users_.add(new User("hw"));
+			users_.add(new User("admin"));
 			
 			users_.get(0).addGroup(new Group("ui"));
 			users_.get(0).addGroup(new Group("hw"));
@@ -94,6 +93,9 @@ public class Right {
 			users_.get(1).addGroup(new Group("ui"));
 			
 			users_.get(2).addGroup(new Group("hw"));
+
+			users_.get(3).addGroup(new Group("ui"));
+			users_.get(3).addGroup(new Group("admin"));
 		}
 	}
 

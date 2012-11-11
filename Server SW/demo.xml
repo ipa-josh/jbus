@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<HAObject id="house" visualization="house" port="8080" visxml="demo_vis.xml">
+<HAObject id="house" visualization="house" port="8081" visxml="demo_vis.xml" auth="auth.xml">
 
 	<HAObject id="Raumle" visualization="room">
 

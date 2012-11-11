@@ -11,8 +11,8 @@ import common.Attribute;
 public class Attr_Boolean extends Attribute {
 	boolean val_;
 
-	public Attr_Boolean(User usr, Group grp) {
-		super(usr, grp);
+	public Attr_Boolean(User usr, Group grp, Attribute parent) {
+		super(usr, grp, parent);
 		// TODO Auto-generated constructor stub
 	}
 

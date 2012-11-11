@@ -18,10 +18,7 @@ package jibble.simplewebserver;
 
 import java.io.*;
 import java.net.*;
-import java.sql.Time;
 import java.util.*;
-import sun.misc.*; 
-
 import jibble.simplewebserver.SimpleWebServer.PathHandle;
 
 /**

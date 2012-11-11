@@ -40,7 +40,7 @@ public class SimpleWebServer extends Thread {
 	}
 
     public static final String VERSION = "SimpleWebServer  http://www.jibble.org/ extended";
-    public static final Hashtable MIME_TYPES = new Hashtable();
+    public static final Hashtable<String,String> MIME_TYPES = new Hashtable<String,String>();
     
     static {
         String image = "image/";

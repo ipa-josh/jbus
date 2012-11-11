@@ -10,6 +10,7 @@ import org.jdom2.input.SAXBuilder;
 import rights.Group;
 import rights.Right;
 import rights.User;
+import common.Attribute;
 import common.HAObject;
 import common.Output;
 
@@ -35,8 +36,8 @@ public class AvrNetIoBoard extends HAObject implements Runnable {
 	private HWDriver driver_ = null;
 	private Thread worker_ = null;
 	
-	public AvrNetIoBoard(User usr, Group grp) {
-		super(Right.getGlobalUser("hw"), Right.getGlobalUser("hw").getFirstGroup());
+	public AvrNetIoBoard(User usr, Group grp, Attribute parent) {
+		super(Right.getGlobalUser("hw"), Right.getGlobalUser("hw").getFirstGroup(), parent);
 		
 		driver_ = new HWDriver(Right.getGlobalUser("hw"));
 		worker_ = new Thread(this);

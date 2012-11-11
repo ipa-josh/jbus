@@ -1,7 +1,5 @@
 package common;
 
-import org.jdom2.JDOMException;
-
 public class Output {
 
 	public static void warning(String s) {

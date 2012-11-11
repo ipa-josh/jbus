@@ -1,6 +1,7 @@
 package common;
 
 import java.util.Calendar;
+import java.util.Vector;
 
 import org.jdom2.*;
 import rights.Group;
@@ -13,9 +14,11 @@ public abstract class Attribute extends Right {
 	protected String visualization_ = "none";
 	protected long ts_creation_=Calendar.getInstance().getTimeInMillis();
 	protected long ts_change_=Calendar.getInstance().getTimeInMillis();
+	protected Attribute parent_ = null;
 
-	public Attribute(User usr, Group grp) {
+	public Attribute(User usr, Group grp, Attribute parent) {
 		super(usr, grp);
+		parent_ = parent;
 		CallbackInst.addDefaultCallbacks(this);
 	}
 	public Object get(User usr) {
@@ -23,6 +26,13 @@ public abstract class Attribute extends Right {
 			if(!canRead(usr))
 				return null;
 			return _get(usr);
+		}
+	}
+	public Vector<Attribute> getUpdate(User usr, long ts) {
+		synchronized(this) {
+			if(!canRead(usr) || (ts_change_<ts&&ts_creation_<ts))
+				return new Vector<Attribute>();
+			return _getUpdate(usr, ts);
 		}
 	}
 	public Object get(User usr, Object v) {
@@ -52,6 +62,12 @@ public abstract class Attribute extends Right {
 	public String getId() {
 		return id_;
 	}
+	
+	public String getAbsoluteId() {
+		if(parent_==null)
+			return "";
+		return parent_.getAbsoluteId()+"/"+id_;
+	}
 
 	public void setId(String id) {
 		id_=id;
@@ -76,6 +92,12 @@ public abstract class Attribute extends Right {
 			visualization_ = t.getValue();
 		
 		return _readXML(el);
+	}
+	
+	protected Vector<Attribute> _getUpdate(User usr, long ts) {
+		Vector<Attribute> l = new Vector<Attribute>();
+		l.add(this);
+		return l;
 	}
 
 	protected Object _get(User usr, Object v) {return null;}
