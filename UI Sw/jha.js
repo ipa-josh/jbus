@@ -7,9 +7,9 @@
 		$.ajax({
 			url: 'visupdate'+ts,
 			dataType: "json",
-			/*error: function(a,b,c) {
-				alert("jha_update: "+a+b+c);
-			},*/
+			error: function(a,b,c) {
+				error_handler.error("auto-update","error while updating");
+			},
 			success: function(data) {
 				ts = data.ts;
 				
@@ -56,7 +56,7 @@
 							dataType: "json",
 							async: async,
 							error: function(a,b,c) {
-								alert(a+b+c);
+								error_handler.error("communication","could not get data");
 							},
 							success: function(data) {
 								jha_parse($this, data);
@@ -97,7 +97,7 @@
 						url: 'set'+data.path,
 						dataType: "json",
 						error: function(a,b,c) {
-							alert(a+b+c);
+							error_handler.error("communication","could not set data");
 						},
 						success: function(res) {
 
