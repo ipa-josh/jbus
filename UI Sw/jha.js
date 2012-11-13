@@ -11,6 +11,7 @@
 				error_handler.error("auto-update","error while updating");
 			},
 			success: function(data) {
+				error_handler.info("auto-update","");
 				ts = data.ts;
 				
 				for(d in data.c) {
@@ -32,6 +33,9 @@
 			for(s in data.subs) {
 				$this.JHA('add',{path:$this.data("path")+"/"+data.subs[s]});
 			}
+		}
+		else if(data.base=="Attr_Error") {
+			error_handle.handle(data);
 		}
 		else if(data.base=="data") {
 			$this.data("data",data.data)
@@ -59,6 +63,7 @@
 								error_handler.error("communication","could not get data");
 							},
 							success: function(data) {
+								error_handler.info("communication","");
 								jha_parse($this, data);
 							}
 						});
@@ -100,6 +105,7 @@
 							error_handler.error("communication","could not set data");
 						},
 						success: function(res) {
+							error_handler.info("communication","");
 
 							if(res) {
 								/*alert(data.path);

@@ -25,12 +25,29 @@
 	</div><!-- /content -->
 
 <div data-role="popup" id="error_dialog">
-	<p>This is a completely basic popup, no options set.<p>
+			<div data-role="collapsible-set" data-theme="b" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" style="margin:0; width:250px;">
+				<div data-role="collapsible" data-inset="false">
+					<h2>Errors</h2>
+					<ul data-role="listview" id="error_list">
+					</ul>
+				</div><!-- /collapsible -->
+				<div data-role="collapsible" data-inset="false">
+					<h2>Warnings</h2>
+					<ul data-role="listview">
+					</ul>
+				</div><!-- /collapsible -->
+				<div data-role="collapsible" data-inset="false">
+					<h2>Info</h2>
+					<ul data-role="listview">
+					</ul>
+				</div><!-- /collapsible -->
+			</div><!-- /collapsible set -->
 </div>
 
 </div><!-- /page -->
 
 <script>
+error_handler.init();
 $('#content').JHA({path:""});
 </script>
 
