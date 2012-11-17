@@ -69,6 +69,12 @@ public abstract class Attribute extends Right {
 			return "";
 		return parent_.getAbsoluteId()+"/"+id_;
 	}
+	
+	public Attribute getRoot() {
+		if(parent_==null)
+			return this;
+		return parent_.getRoot();
+	}
 
 	public void setId(String id) {
 		id_=id;
