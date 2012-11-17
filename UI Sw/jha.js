@@ -17,7 +17,11 @@
 				ts = data.ts;
 				
 				for(d in data.c) {
-					if(d in map) {
+					if(d=="") {
+						$('#content').JHA({path:""});
+						jha_parse($('#content'), data.c[d]);
+					}
+					else if(d in map) {
 						//alert(d);
 						jha_parse($("#"+map[d]), data.c[d]);
 						$("#"+map[d]).parent().JHAVis('update');
@@ -32,6 +36,7 @@
 	
 	function jha_parse($this, data) {
 		if(data.base=="HAObject"||data.base=="HARoot") { //container
+			$this.data("subs",data.subs)
 			for(s in data.subs) {
 				$this.JHA('add',{path:$this.data("path")+"/"+data.subs[s]});
 			}
@@ -50,7 +55,7 @@
 				return this.each(function(){
 					var $this = $(this)
 					$this.data('path', data.path)
-					var async=true;
+					/*var async=true;
 					if("sync" in data)
 						async = !data.sync
 
@@ -65,7 +70,7 @@
 								error_handler.clear("communication");
 								jha_parse($this, data);
 							}
-						});
+						});*/
 				});
 			},
 			destroy : function( ) {
@@ -92,6 +97,15 @@
 
 			getChild:  function(data) {
 				return $("#"+map[$(this).data('path')+"/"+data.name]);
+			},
+
+			getAllChildren:  function() {
+				var r=[];
+				var subs = $(this).data('subs');
+				for(s in subs) {
+					r[r.length] =  $("#"+map[$(this).data('path')+"/"+subs[s]]);
+				}
+				return r;
 			},
 
 			set:  function(data) {
