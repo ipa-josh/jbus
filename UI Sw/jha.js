@@ -9,6 +9,8 @@
 			dataType: "json",
 			error: function(a,b,c) {
 				error_handler.error("auto-update","error while updating");
+				
+				setTimeout(jha_update, 1000);
 			},
 			success: function(data) {
 				error_handler.info("auto-update","");
