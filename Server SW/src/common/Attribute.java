@@ -14,6 +14,7 @@ public abstract class Attribute extends Right {
 	protected String visualization_ = "none";
 	protected long ts_creation_=Calendar.getInstance().getTimeInMillis();
 	protected long ts_change_=Calendar.getInstance().getTimeInMillis();
+	protected long ts_change_subs_=Calendar.getInstance().getTimeInMillis();
 	protected Attribute parent_ = null;
 
 	public Attribute(User usr, Group grp, Attribute parent) {
@@ -30,7 +31,7 @@ public abstract class Attribute extends Right {
 	}
 	public Vector<Attribute> getUpdate(User usr, long ts) {
 		synchronized(this) {
-			if(!canRead(usr) || (ts_change_<ts&&ts_creation_<ts))
+			if(!canRead(usr) || (ts_change_<ts&&ts_creation_<ts&&ts_change_subs_<ts))
 				return new Vector<Attribute>();
 			return _getUpdate(usr, ts);
 		}
