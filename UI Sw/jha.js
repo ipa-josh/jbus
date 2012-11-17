@@ -13,7 +13,7 @@
 				setTimeout(jha_update, 1000);
 			},
 			success: function(data) {
-				error_handler.info("auto-update","");
+				error_handler.clear("auto-update");
 				ts = data.ts;
 				
 				for(d in data.c) {
@@ -36,16 +36,13 @@
 				$this.JHA('add',{path:$this.data("path")+"/"+data.subs[s]});
 			}
 		}
-		else if(data.base=="Attr_Error") {
-			error_handle.handle(data);
-		}
 		else if(data.base=="data") {
 			$this.data("data",data.data)
 			return
 		}
 
 		//alert(data.vis);
-		$this.JHA('visualize',{vis:data.vis});
+		if(!$this.data('vis')) $this.JHA('visualize',{vis:data.vis});
 	}
 
 	var methods = {
@@ -65,7 +62,7 @@
 								error_handler.error("communication","could not get data");
 							},
 							success: function(data) {
-								error_handler.info("communication","");
+								error_handler.clear("communication");
 								jha_parse($this, data);
 							}
 						});
@@ -107,7 +104,7 @@
 							error_handler.error("communication","could not set data");
 						},
 						success: function(res) {
-							error_handler.info("communication","");
+							error_handler.clear("communication");
 
 							if(res) {
 								/*alert(data.path);
