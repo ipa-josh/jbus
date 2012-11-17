@@ -74,12 +74,16 @@ var gl_vis_temp={};
 
 			update:  function(data) {
 				return this.each(function(){
-					var vis = $(this).data('vis')
-					$(this).offset({ top: vis.pos.y, left: vis.pos.x})
-					var $this = $(this)
+					try {
+						var vis = $(this).data('vis');
+						var off = $(this).parent().offset();
+						$(this).offset({ top: parseFloat(off.top)+parseFloat(vis.pos.y), left: parseFloat(off.left)+parseFloat(vis.pos.x)});
+						var $this = $(this);
 
-					loadVisData(vis.vis).vis($this,vis)
-
+						loadVisData(vis.vis).vis($this,vis)
+					}catch(e) {
+						//alert($(this).data('vis'));
+					}
 				});
 			}
 	};
