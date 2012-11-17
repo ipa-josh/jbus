@@ -13,6 +13,7 @@ import rights.User;
 import common.Attribute;
 import common.HAObject;
 import common.Output;
+import common.attributes.Attr_Error;
 
 public class AvrNetIoBoard extends HAObject implements Runnable {
 
@@ -35,39 +36,38 @@ public class AvrNetIoBoard extends HAObject implements Runnable {
 
 	private HWDriver driver_ = null;
 	private Thread worker_ = null;
-	
+
 	public AvrNetIoBoard(User usr, Group grp, Attribute parent) {
 		super(Right.getGlobalUser("hw"), Right.getGlobalUser("hw").getFirstGroup(), parent);
-		
-		driver_ = new HWDriver(Right.getGlobalUser("hw"));
+
+		driver_ = new HWDriver(Right.getGlobalUser("hw"), parent);
 		worker_ = new Thread(this);
 	}
 
 	@Override
 	public boolean _readXML(Element el) {;
-		try {
-			if(!super._readXML( (new SAXBuilder()).build( new StringReader(_descr_) ).getRootElement()))
+	try {
+		if(!super._readXML( (new SAXBuilder()).build( new StringReader(_descr_) ).getRootElement()))
+			return false;
+		synchronized(this) {
+			if(!driver_.readXML(el))
 				return false;
-			synchronized(this) {
-				if(!driver_.readXML(el))
-					return false;
-			}
-			for(int i=0; i<list_.size(); i++)
-				list_.get(i).getNotifier().addCallback(driver_);
-			worker_.start();
-			return true;
-		} catch (JDOMException e) {
-			Output.error(e);
-		} catch (IOException e) {
-			Output.error(e);
 		}
-		return false;
+		for(int i=0; i<list_.size(); i++)
+			list_.get(i).getNotifier().addCallback(driver_);
+		worker_.start();
+		return true;
+	} catch (JDOMException e) {
+		Output.error(e);
+	} catch (IOException e) {
+		Output.error(e);
+	}
+	return false;
 	}
 
 	@Override
 	public void run() {
 
-		
 		while(true) {
 			try {
 				Thread.sleep(100);
@@ -79,7 +79,7 @@ public class AvrNetIoBoard extends HAObject implements Runnable {
 					driver_.polling(this);
 				}
 		}
-		
+
 	}
 
 }

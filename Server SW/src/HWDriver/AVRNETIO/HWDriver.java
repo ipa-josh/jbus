@@ -3,6 +3,7 @@ package HWDriver.AVRNETIO;
 import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 
+import rights.Right;
 import rights.User;
 
 import common.Attribute;
@@ -11,13 +12,19 @@ import common.CallbackInst;
 import common.Output;
 import common.Path;
 import common.attributes.Attr_Boolean;
+import common.attributes.Attr_Error;
 
 public class HWDriver extends CallbackInst implements Callback {
-	public HWDriver(User usr) {
+	public HWDriver(User usr, Attribute parent_) {
 		super(usr);
+		status_ = new Attr_Error(Right.getGlobalUser("ui"), Right.getGlobalUser("ui").getFirstGroup(), parent_);
+		status_.setId(parent_.getId()+"_status");
 	}
 
+	private Attr_Error status_ = null;
 	private AvrNetIo hw_ = null;
+	
+	public Attr_Error getStatus() {return status_;}
 
 	@Override
 	public boolean onAttributeChanged(Attribute attr) {
@@ -76,25 +83,31 @@ public class HWDriver extends CallbackInst implements Callback {
 		return true;
 	}
 
-	public void polling(AvrNetIoBoard avrNetIoBoard) {
+	public boolean check() {
 		if(hw_==null) {
-			Output.warning("no AvrNetIo hardware found");
-			return;
+			status_.setStatus(Right.getGlobalUser("ui"), Attr_Error.STATUS.WARNING, "no AvrNetIo hardware found");
+			return false;
 		}
 
 		if(!hw_.isConnected())
 			if(!hw_.connect()) {
-				Output.error("couldn't connect to device");
-				return;
+				status_.setStatus(Right.getGlobalUser("ui"), Attr_Error.STATUS.ERROR, "couldn't connect to device");
+				return false;
 			}
-
+		
+		status_.clear(Right.getGlobalUser("ui"));
+		
+		return true;
+	}
+	
+	public void polling(AvrNetIoBoard avrNetIoBoard) {
 		for(int port=1; port<=4; port++) {
 			Path p = new Path();
 			p.setAttribute();
 			p.parseString("in"+port);
 			Object o=avrNetIoBoard.get(user_,p);
 			if(o==null||!Attribute.class.isAssignableFrom(o.getClass())) {
-				Output.warning("AvrNetIo misconfigured");
+				status_.setStatus(Right.getGlobalUser("ui"), Attr_Error.STATUS.WARNING, "AvrNetIo misconfigured");
 				continue;
 			}
 			Attribute a=(Attribute) o;
@@ -106,6 +119,8 @@ public class HWDriver extends CallbackInst implements Callback {
 	}
 
 	public boolean readXML(Element el) {
+		status_.clear(Right.getGlobalUser("ui"));
+		
 		org.jdom2.Attribute t;
 
 		String ip="";
@@ -121,6 +136,7 @@ public class HWDriver extends CallbackInst implements Callback {
 			try {
 				port=t.getIntValue();
 			} catch (DataConversionException e) {
+				status_.setStatus(Right.getGlobalUser("ui"), Attr_Error.STATUS.ERROR, e.toString());
 				Output.error(e);
 				return false;
 			}
@@ -129,7 +145,7 @@ public class HWDriver extends CallbackInst implements Callback {
 		if ( ip.matches( "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}" ) )
 			hw_ = new AvrNetIo(ip,port);
 		else {
-			Output.error("ip misswritten: "+ip);
+			status_.setStatus(Right.getGlobalUser("ui"), Attr_Error.STATUS.ERROR, "ip misswritten: "+ip);
 			return false;
 		}
 
@@ -139,7 +155,7 @@ public class HWDriver extends CallbackInst implements Callback {
 			if ( gw.matches( "^.[0-9]{1,3}/..[0-9]{1,3}/..[0-9]{1,3}/..[0-9]{1,3}" ) )
 				hw_.setGW(gw);
 			else
-				Output.error("gw misswritten: "+gw);
+				status_.setStatus(Right.getGlobalUser("ui"), Attr_Error.STATUS.ERROR, "gw misswritten: "+gw);
 		}
 
 		t=el.getAttribute("mask");
@@ -148,11 +164,11 @@ public class HWDriver extends CallbackInst implements Callback {
 			if ( mask.matches( "^.[0-9]{1,3}/..[0-9]{1,3}/..[0-9]{1,3}/..[0-9]{1,3}" ) )
 				hw_.setMask(mask);
 			else
-				Output.error("mask misswritten: "+mask);
+				status_.setStatus(Right.getGlobalUser("ui"), Attr_Error.STATUS.ERROR, "mask misswritten: "+mask);
 		}
 
 		if(!hw_.connect()) {
-			Output.error("couldn't connect to device");
+			status_.setStatus(Right.getGlobalUser("ui"), Attr_Error.STATUS.ERROR, "couldn't connect to device");
 			//hw_ = null;
 			//return false;
 		}
