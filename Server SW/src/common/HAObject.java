@@ -34,7 +34,7 @@ public class HAObject extends Attribute {
 			if(list_.get(i).getId().equals(s))
 				if( list_.get(i).set(usr, pwd.get()) )
 				{
-					ts_change_=Calendar.getInstance().getTimeInMillis();
+					ts_change_subs_=Calendar.getInstance().getTimeInMillis();
 					return true;
 				}
 				else
@@ -86,12 +86,16 @@ public class HAObject extends Attribute {
 
 	protected Vector<Attribute> _getUpdate(User usr, long ts) {
 		Vector<Attribute> l = new Vector<Attribute>();
+		if(ts_change_>=ts||ts_creation_>=ts)
+			l.add(this);
 		for(int i=0; i<list_.size(); i++)
 			l.addAll( list_.get(i).getUpdate(usr, ts) );
 		return l;
 	}
 
 	public boolean _readXML(Element el) {
+		ts_change_=Calendar.getInstance().getTimeInMillis();
+		
 		list_.clear();
 
 		for( Element sub : el.getChildren())
@@ -201,6 +205,10 @@ public class HAObject extends Attribute {
 		}
 
 		return true;
+	}
+
+	public void add(Attribute status) {
+		list_.add(status);
 	}
 
 }
