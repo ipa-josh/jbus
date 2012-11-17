@@ -24,7 +24,7 @@ public class Path {
 		return attribute_;
 	}
 	
-	public void parseString(String s) {
+	public Path parseString(String s) {
 		nodes_.clear();
 		String n[] = s.split("/");
 		for(int i=0; i<n.length; i++) {
@@ -34,6 +34,7 @@ public class Path {
 			else
 				nodes_.add(n[i]);
 		}
+		return this;
 	}
 	
 	public String popFront() {
