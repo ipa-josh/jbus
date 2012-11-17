@@ -35,7 +35,8 @@ public class HARoot extends HAObject {
 		
 		int port=8080;
 		String visxml="", auth="";
-		boolean restore = true;
+		boolean restore = false;
+		int restore_ms = 1000;
 		
 		org.jdom2.Attribute t = el.getAttribute("port");
 		if(t!=null)
@@ -55,7 +56,8 @@ public class HARoot extends HAObject {
 		t = el.getAttribute("restore");
 		try {
 		if(t!=null)
-			restore = Boolean.parseBoolean(t.getValue());
+			restore = true;
+			restore_ms = Integer.parseInt(t.getValue());
 		} catch(Exception e) {Output.error(e);}
 		
 		try {
@@ -71,7 +73,16 @@ public class HARoot extends HAObject {
 		
 		System.out.println("Started...");
 		
-		if(restore) history.restore(Right.getGlobalUser("ui"));
+		if(restore) {
+			try {
+				Thread.sleep(restore_ms);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			history.restore(Right.getGlobalUser("ui"));
+		}
+		
+		history.capture();
 		
 		return r;
 	}
