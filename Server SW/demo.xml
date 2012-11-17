@@ -24,6 +24,8 @@
 		</HAObject>
 		
 		
+		<AvrNetIoBoard port="8013" id="board1" ip="127.0.0.77"/>
+		
 		<connection a="Hauptlicht1/status" b="board1/out1" />
 
 
