@@ -29,6 +29,7 @@ import jibble.simplewebserver.SimpleWebServer.PathHandle;
 public class LogSqLite implements Callback {
 	Attribute root_ = null;
 	SQLiteQueue queue_ = null;
+	boolean capture_ = false;
 
 	public LogSqLite(Attribute root, String fn) {
 		root_ = root;
@@ -44,12 +45,21 @@ public class LogSqLite implements Callback {
 	}
 
 	private void log(final Attribute attr, final Date utime, final User usr) {
+		synchronized (this) {
+			if(!capture_)
+				return;
+		}
 		//YYYY-MM-DD HH:MM:SS.SSS
 		queue_.execute(new SQLiteJob<Object>() {
 			protected Object job(SQLiteConnection connection) throws SQLiteException {
 				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 				//System.out.println("INSERT INTO history VALUES('"+attr.getAbsoluteId()+"','"+attr.get(usr)+"',julianday('"+fmt.format(utime)+"'))");
-				connection.exec("INSERT INTO history VALUES('"+attr.getAbsoluteId()+"','"+attr.get(usr)+"',julianday('"+fmt.format(utime)+"'))");
+				
+			    SQLiteStatement st = connection.prepare("INSERT INTO history VALUES(?,?,julianday('"+fmt.format(utime)+"'))");
+			    st.bind(1, attr.getAbsoluteId());
+			    st.bind(2, attr.get(usr).toString());
+			    st.stepThrough();
+
 				return null;
 			}
 		});
@@ -57,6 +67,7 @@ public class LogSqLite implements Callback {
 
 	@Override
 	public boolean onAttributeChanged(Attribute attr) {
+		System.out.println(attr.getAbsoluteId());
 		Date d = new Date();
 		synchronized(this) {
 			log(attr, d, Right.getGlobalUser("ui"));
@@ -90,6 +101,12 @@ public class LogSqLite implements Callback {
 			db_.dispose();
 		} catch (SQLiteException ex) {
 			Logger.getLogger(LogSqLite.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+
+	public void capture() {
+		synchronized (this) {
+			capture_ = true;
 		}
 	}
 
