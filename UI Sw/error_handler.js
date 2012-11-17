@@ -25,22 +25,28 @@ error_handler = {
 	},
 	error: function(src_id, descr) {this.msg(this.ERROR, src_id, descr);},
 	warn: function(src_id, descr) {this.msg(this.WARNING, src_id, descr);},
+	info: function(src_id, descr) {this.msg(this.INFO, src_id, descr);},
+	clear: function(src_id) {this.msg(this.INFO, src_id, "");},
 
-	handle: function(data) {
-		var s=data.data.split("|");
+	handle: function(id,data) {
+		var s=data.split(",",2);
 		var st=this.ERROR;
-		if(s[0]=="INFO") st=this.INFO;
-		else if(s[0]=="WARN") st=this.WARNING;
-		this.msg(st,s[1],s[2]);
+		if(s[0]=="OK") st=this.INFO;
+		else if(s[0]=="WARNING") st=this.WARNING;
+		this.msg(st,id,s[1]);
 	},
 
 	update: function() {
-		if(this.nums[this.ERROR]>0)
-			$(this.divid).html('<img src="img/error.gif" />');
-		else if(this.nums[this.WARNING]>0)
-			$(this.divid).html('<img src="img/warning.png" />');
-		else
-			$(this.divid).html('');
+		if($(this.divid).html().length<90) $(this.divid).html('<img src="img/error.gif" class="img_err"/><img src="img/warning.png" class="img_warn"/>');
+		if(this.nums[this.ERROR]>0) {
+			$(this.divid).find(".img_err").show();
+			$(this.divid).find(".img_warn").hide();}
+		else if(this.nums[this.WARNING]>0) {
+			$(this.divid).find(".img_err").hide();
+			$(this.divid).find(".img_warn").show();}
+		else {
+			$(this.divid).find(".img_err").hide();
+			$(this.divid).find(".img_warn").hide();}
 	},
 
 	init: function() {
