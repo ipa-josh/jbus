@@ -66,15 +66,18 @@ public class AvrNetIoBoard extends HAObject implements Runnable {
 
 	@Override
 	public void run() {
+
 		
 		while(true) {
-			synchronized(this) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {}
-				
-				driver_.polling(this);
-			}
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
+
+			if(driver_.check())
+				//synchronized(this)
+				{
+					driver_.polling(this);
+				}
 		}
 		
 	}
