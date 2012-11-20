@@ -216,4 +216,13 @@ public class HAObject extends Attribute {
 		list_.add(status);
 	}
 
+	public boolean remove(String s) {
+		for(int i=0; i<list_.size(); i++)
+			if(list_.get(i).getId().equals(s)) {
+				list_.remove(i);
+				return true;
+			}
+		return false;
+	}
+
 }
