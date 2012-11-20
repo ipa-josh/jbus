@@ -1,3 +1,5 @@
+if(!on_new_element) var on_new_element = function() {};
+
 (function( $ ) {
 	var id=0;
 	var map={};
@@ -22,11 +24,10 @@
 						jha_parse($('#content'), data.c[d]);
 					}
 					else if(d in map) {
-						//alert(d);
 						jha_parse($("#"+map[d]), data.c[d]);
 						$("#"+map[d]).parent().JHAVis('update');
 					}
-					//else alert("error "+d);
+					else alert("error "+d);
 				}
 				
 				jha_update();
@@ -47,7 +48,10 @@
 		}
 
 		//alert(data.vis);
-		if(!$this.data('vis')) $this.JHA('visualize',{vis:data.vis});
+		if(!$this.data('vis')) {
+			$this.JHA('visualize',{vis:data.vis});
+			on_new_element($this);
+		}
 	}
 
 	var methods = {
