@@ -83,6 +83,10 @@ public abstract class Attribute extends Right {
 	public String getVisualization() {
 		return visualization_;
 	}
+
+	public void setVisualization(String vis) {
+		visualization_ = vis;
+	}
 	
 	public boolean readXML(Element el) {
 		//if(!super.readXML(el))
