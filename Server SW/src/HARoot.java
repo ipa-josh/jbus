@@ -33,6 +33,18 @@ public class HARoot extends HAObject {
 		
 		boolean r = super._readXML(el);
 		
+		//add error handler
+		HAObject error_handler = new HAObject(Right.getGlobalUser("ui"),Right.getGlobalUser("ui").getFirstGroup(), this);
+		error_handler.setId("error_handler");
+		error_handler.setVisualization("error");
+		add( error_handler );
+		
+		//add handler for editor
+		/*HAObject editor_handler = new HAObject(Right.getGlobalUser("admin"),Right.getGlobalUser("admin").getFirstGroup(), this);
+		editor_handler.setId("error_handler");
+		editor_handler.setVisualization("error");
+		add( editor_handler );*/
+		
 		int port=8080;
 		String visxml="", auth="";
 		boolean restore = false;
