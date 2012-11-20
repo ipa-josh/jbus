@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-import HWDriver.REBOOT.Reboot;
+import HWDriver.COMMAND.Command;
 
 import common.Output;
 
@@ -22,7 +22,7 @@ public class HAMain {
 		String fn = args[0];*/
 		String fn = "demo.xml";
 		
-		Reboot.sFn_ = fn;
+		Command.sFn_ = fn;
 		
 		HARoot root = new HARoot();
 		try {
