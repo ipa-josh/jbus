@@ -36,6 +36,14 @@ public class Attr_Error extends Attribute {
 
 		((HAObject)parent_).add(this);
 	}
+
+	//prevent from replacing error handler
+	public void setId(String id) {
+		if(parent_.get(getUser(),(new Path()).parseString(id))!=null)
+			setId(id+"_");
+		else
+			id_=id;
+	}
 	
 	public void setStatus(User usr, STATUS s, String descr) {
 		switch(s) {
