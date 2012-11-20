@@ -58,23 +58,7 @@ if(!on_new_element) var on_new_element = function() {};
 			init : function(data) {
 				return this.each(function(){
 					var $this = $(this)
-					$this.data('path', data.path)
-					/*var async=true;
-					if("sync" in data)
-						async = !data.sync
-
-						$.ajax({
-							url: 'get'+data.path,
-							dataType: "json",
-							async: async,
-							error: function(a,b,c) {
-								error_handler.error("communication","could not get data");
-							},
-							success: function(data) {
-								error_handler.clear("communication");
-								jha_parse($this, data);
-							}
-						});*/
+					$this.data('path', data.path);
 				});
 			},
 			destroy : function( ) {
