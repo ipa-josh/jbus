@@ -54,10 +54,10 @@ public class VisUpdater implements Callback, PathHandle {
 			return toJSon(user, l, ts_look);
 
 		synchronized (this) {
-		try {
-			wait(timeout_);
-		} catch (InterruptedException e) {
-		}
+			try {
+				wait(timeout_);
+			} catch (InterruptedException e) {
+			}
 		}
 
 		ts_look = Calendar.getInstance().getTimeInMillis();
