@@ -93,10 +93,13 @@ public class HAObject extends Attribute {
 		return l;
 	}
 
-	public boolean _readXML(Element el) {
-		ts_change_=Calendar.getInstance().getTimeInMillis();
-		
+	public boolean _readXML(Element el) {		
 		list_.clear();
+		return addXML(el);
+	}
+
+	public boolean addXML(Element el) {	
+		ts_change_=Calendar.getInstance().getTimeInMillis();
 
 		for( Element sub : el.getChildren())
 		{
@@ -203,6 +206,8 @@ public class HAObject extends Attribute {
 			else
 				Output.error("could not connect "+ta.getValue()+" and "+tb.getValue() + " ("+(a==null?"0":"1")+(b==null?"0":"1")+")");
 		}
+
+		ts_change_=Calendar.getInstance().getTimeInMillis();
 
 		return true;
 	}
