@@ -1,0 +1,96 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>JHA</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="css/jquery.mobile-1.2.0.min.css" />
+	<link rel="stylesheet" href="css/thermometer.css" />
+	
+	<script src="dep/jquery-1.7.1.min.js"></script>
+	<script src="dep/jquery-ui.min.js"></script>
+	<script src="dep/jquery.mobile-1.2.0.min.js"></script>
+	<script src="dep/jquery.nicescroll.js"></script>
+	<script src="error_handler.js"></script>
+	
+	<script src="dep/jquery.ui.touch-punch.min.js"></script>
+	<script src="editor/editor.js"></script>
+	
+	<script src="jha.js"></script>
+	<script src="vis.js"></script>
+	
+	<link rel="stylesheet" href="css/editor.css" />
+</head> 
+<body> 
+
+<div data-role="page" id="main" style="position:absolute">
+
+	<div data-role="header" style="z-index:1000;">
+		<a href="#error_dialog" data-rel="popup" id="status" style="float:left;padding:5px;width:23px;height:23px;"></a>
+		<h1 id="title" style="height:25px">Josh's Home Automation</h1>
+	</div><!-- /header -->
+
+	<table><tr>
+	<td width="350px">
+		<div data-role="collapsible">
+			<h2>Background Elements</h2>
+			<ul data-role="listview" data-filter="true" data-filter-theme="c" data-divider-theme="d">
+				<li><div id="test">Adam Kinkaid</div></li>
+				<li><a href="index.html">Alex Wickerham</a></li>
+				<li><a href="index.html">Avery Johnson</a></li>
+				<li><a href="index.html">Bob Cabot</a></li>
+				<li><a href="index.html">Caleb Booth</a></li>
+			</ul>
+		</div>
+		<div data-role="collapsible">
+			<h2>User Interfaces</h2>
+			<ul data-role="listview" data-filter="true" data-filter-theme="c" data-divider-theme="d">
+			</ul>
+		</div>
+		<div data-role="collapsible">
+			<h2>Hardware</h2>
+			<ul data-role="listview" data-filter="true" data-filter-theme="c" data-divider-theme="d">
+			</ul>
+		</div>
+		<div data-role="button" data-icon="delete" id="bin">Delete</div>
+	</td>
+	<td>
+		<div id="content" style="width:100%;height:100%;position:absolute;top:41px">	
+		</div><!-- /content -->
+	</td>
+	</tr></table>
+
+<div data-role="popup" id="error_dialog" style="z-index:2001;">
+			<div data-role="collapsible-set" data-theme="b" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" style="z-index:2001;margin:0; width:500px;">
+				<div data-role="collapsible" data-inset="false">
+					<h2>Errors</h2>
+					<ul data-role="listview" id="error_list">
+					</ul>
+				</div><!-- /collapsible -->
+				<div data-role="collapsible" data-inset="false">
+					<h2>Warnings</h2>
+					<ul data-role="listview">
+					</ul>
+				</div><!-- /collapsible -->
+				<div data-role="collapsible" data-inset="false">
+					<h2>Info</h2>
+					<ul data-role="listview">
+					</ul>
+				</div><!-- /collapsible -->
+			</div><!-- /collapsible set -->
+</div>
+
+</div><!-- /page -->
+
+<script>
+error_handler.init();
+$("html").niceScroll();
+$("#bin").droppable({
+	drop: function( event, ui ) {
+	  alert("delete");
+	  return false;
+	}
+});
+</script>
+
+</body>
+</html>
