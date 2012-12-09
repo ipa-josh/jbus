@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="C:/Users/Josh/Google Drive/JHA/Server SW/jdom-2.0.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Josh/Google Drive/JHA/Server SW/sqlite4java.jar"/>
+	<classpathentry kind="lib" path="SunriseSunsetCalculator-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
