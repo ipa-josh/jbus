@@ -1,6 +1,7 @@
 package HWDriver.JBUS;
 
 import java.util.Calendar;
+import java.util.Vector;
 
 public class JBusNode {
 	private int hw_id_;
@@ -9,7 +10,8 @@ public class JBusNode {
 	private boolean pins_[];
 	private PinConfiguration conf_pins_[];
 	private int polling_ms_ = 250;
-	private long ts_polled_ = 0;
+	private long ts_polled_ = Calendar.getInstance().getTimeInMillis();
+	private long ts_last_received_ = 0;
 	
 	private static class PinConfiguration {
 		enum CONFIG {
@@ -28,6 +30,8 @@ public class JBusNode {
 		READY,
 		NOT_FOUND
 	}
+	
+	final int GET_INPUT = 0;
 	
 	private STATUS status_ = STATUS.NOT_INITIZALIZED;
 	private JBusInterface intf_;
@@ -54,21 +58,45 @@ public class JBusNode {
 		polling_ms_ = v;
 	}
 	
-	public int getPolled() {
+	public long getPolled() {
 		return ts_polled_;
 	}
 	
-	public void polled(int v) {
+	public void polled() {
 		ts_polled_ = Calendar.getInstance().getTimeInMillis();
 	}
 	
 	public int readAnalog(int pin) throws Exception {
 		if(pin<0 || pin>max_analog_pins_)
 			throw new Exception("pin no. out of range");
+		return pin;
+	}
+	
+	public JBusInterface.Message ping() {
+		return new JBusInterface.Message(hw_id_);
+	}
+	
+	public boolean parseMessage(JBusInterface.Message msg) throws Exception {		
+		if(msg.getId()!=hw_id_)
+			throw new Exception("hardware id does not match");
+		
+		ts_last_received_ = Calendar.getInstance().getTimeInMillis();
+
+		if(msg.length()==6)
+			return true; //ping
+		
+		switch(msg.read(6,2)) {
+		case GET_INPUT:
+			if(msg.length()!=)
+				throw new Exception("malformed message INPUT");
+			break;
+		}
+		
+		return false;
 	}
 	
 	public boolean []readInput() {
-		int input;
+		int input = 0;
 		boolean r[] = new boolean[max_pins_];
 		for(int i=0; i<r.length; i++)
 			r[i] = (input&(1<<i))>0;
@@ -76,6 +104,7 @@ public class JBusNode {
 	}
 	
 	public boolean setOutput() {
+		return false;
 		
 	}
 	
