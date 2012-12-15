@@ -2,3 +2,8 @@
     min-height: 60px;
     padding-left: 100px;
 }
+
+.menu ul li {
+	cursor: pointer;
+	z-index: 100;
+}
