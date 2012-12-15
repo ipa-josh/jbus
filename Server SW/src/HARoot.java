@@ -31,13 +31,13 @@ public class HARoot extends HAObject {
 		CallbackInst.addDefaultCallback(history);
 		CallbackInst.addDefaultCallback(visup);
 		
-		boolean r = super._readXML(el);
-		
 		//add error handler
 		HAObject error_handler = new HAObject(Right.getGlobalUser("ui"),Right.getGlobalUser("ui").getFirstGroup(), this);
 		error_handler.setId("error_handler");
 		error_handler.setVisualization("error");
 		add( error_handler );
+		
+		boolean r = super.addXML(el);
 		
 		//add handler for editor
 		/*HAObject editor_handler = new HAObject(Right.getGlobalUser("admin"),Right.getGlobalUser("admin").getFirstGroup(), this);

@@ -32,7 +32,7 @@ public class Attr_Error extends Attribute {
 	String descr_ = "";
 
 	public Attr_Error(User usr, Group grp, Attribute parent) {
-		super(usr, grp, ((HAObject)parent.getRoot().get(usr, (new Path()).parseString("/error_handler"))));
+		super(usr, grp, (HAObject)(parent.getRoot().get(usr, (new Path()).parseString("/error_handler"))) );
 
 		((HAObject)parent_).add(this);
 	}
