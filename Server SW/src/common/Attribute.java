@@ -48,10 +48,15 @@ public abstract class Attribute extends Right {
 			if(!canWrite(usr))
 				return false;
 
+			Object o = _get(usr);
 			if(!_set(usr,v))
 				return false;
 
-			notifier_.notify(this);
+			if(!notifier_.notify(this)) {
+				_set(usr, o);
+				notifier_.notify(this);
+			}
+			
 			return true;
 		}
 	}
