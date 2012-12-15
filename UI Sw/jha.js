@@ -50,7 +50,7 @@ if(!on_new_element) var on_new_element = function() {};
 		//alert(data.vis);
 		if(!$this.data('vis')) {
 			$this.JHA('visualize',{vis:data.vis});
-			on_new_element($this);
+			on_new_element($this, data.vis);
 		}
 	}
 

@@ -7,41 +7,57 @@ var editor_intf = {
 	remove: function(path) {
 		//TODO:
 		$("#content").JHA('getChild',{name: path}).remove();
+	},
+			
+	addMenuEntry: function(cat, entry) {
+		var list=["background-elements","user-interfaces","hardware"];
+		
+		$("#"+list[cat]).append('<li>'+entry+'</li>').listview('refresh');
 	}
 	
 };
+var gl_editor_temp={};
 
 (function( $ ) {
+	function loadEditorData(name) {
+		if(name!="default") loadEditorData("default");
+		
+		if(name in gl_editor_temp)
+			return gl_editor_temp[name]
+
+		$.ajax({
+			url: "jsedit/"+name+".js",
+			dataType: "script",
+			cache: false,
+			async: false,
+			success: function(data) {
+			},
+			error: function(a,b,c) {
+				alert("e1: "+a+b+c);
+			}
+		});
+
+		if(name in gl_editor_temp)
+			return gl_editor_temp[name]
+
+		alert("editor "+name+" not available")
+			return {}
+	}
 	
-	on_new_element = function($this) {
-		$this.mouseenter(function(){$(this).effect("highlight", {}, 3000);});
-		$this.click(function() {alert(1);return false;});
-		if($this.data('subs'))
-			$this.droppable({
-				drop: function( event, ui ) {
-				  alert(2);
-				}
-			});
-			
+	on_new_element = function($this, vis) {
 		try {
-			$this.draggable({ delay: 200 });
-			$this.draggable( "option", "revert", true );
-		}
-		catch(e) {
+			loadEditorData(vis).init($this);
+		} catch(e) {
+			alert(e);
 		}
 	};
-	
-          /*$( "#droppable" ).droppable({
-            drop: function( event, ui ) {
-              $( this )
-                .addClass( "ui-state-highlight" )
-                .find( "p" )
-                  .html( "Dropped!" );
-            }*/
 
-	/*var methods = {
+	var methods = {
 			init : function(data) {
 				return this.each(function(){
+					$(this).css("z-index", 100);
+					$(this).draggable({ helper: "clone", opacity: 0.9
+					});
 				});
 			},
 			destroy : function( ) {
@@ -51,7 +67,7 @@ var editor_intf = {
 			}
 	};
 
-	$.fn.Editor = function( method ) {
+	$.fn.droppableMenuEntry = function( method ) {
 
 		// Method calling logic
 		if ( methods[method] ) {
@@ -62,6 +78,6 @@ var editor_intf = {
 			$.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
 		}    
 
-	};*/
+	};
 
 })( jQuery );

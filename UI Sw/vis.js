@@ -55,9 +55,9 @@ var gl_vis_temp={};
 								success: function(data) {
 									options = $.extend(options, data);
 
-									$this.data("vis",options)
-									loadVisData(options['vis']).init($this)
-									$this.JHAVis('update')
+									$this.data("vis",options);
+									loadVisData(options['vis']).init($this);
+									$this.JHAVis('update');
 								}
 							});
 
