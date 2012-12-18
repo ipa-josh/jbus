@@ -36,13 +36,13 @@ if(!on_new_element) var on_new_element = function() {};
 	}
 	
 	function jha_parse($this, data) {
-		if(data.base=="HAObject"||data.base=="HARoot") { //container
+		if(data.subs) { //container
 			$this.data("subs",data.subs)
 			for(s in data.subs) {
 				$this.JHA('add',{path:$this.data("path")+"/"+data.subs[s]});
 			}
 		}
-		else if(data.base=="data") {
+		if(data.base=="data") {
 			$this.data("data",data.data)
 			return
 		}
