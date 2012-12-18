@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <HAObject id="house" visualization="house" port="8081" visxml="demo_vis.xml" auth="auth.xml" restore="5000">
-	
+	<Sunset id="sun" visualization="sunset"/>
+		
 	<HAObject id="Raumle" visualization="room">
 
 		<HAObject id="Hauptlicht1" visualization="light">
