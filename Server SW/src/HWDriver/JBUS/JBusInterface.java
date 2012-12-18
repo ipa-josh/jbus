@@ -10,6 +10,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 import HWDriver.AVRNETIO.AvrNetIo;
+import HWDriver.JBUS.JBusInterface.Message;
 
 import rights.Group;
 import rights.Right;
@@ -95,6 +96,21 @@ public class JBusInterface extends HAObject implements Runnable {
 	private Attr_Error status_;
 	private JBusHW driver_ = null;
 	private int polling_interval_ = 250;
+	private int discoverID_ = -1;
+	
+	private void doDiscover() {
+		if(discoverID_<0) return;
+		Message msg = new Message(discoverID_);
+		addMessage(msg);
+		++discoverID_;
+		if(discoverID_>=(1<<6))
+			discoverID_ = -1;
+	}
+	
+	public void discover() {
+		discoverID_ = 0;
+		doDiscover();
+	}
 
 	@Override
 	public boolean _readXML(Element el) {
@@ -112,6 +128,16 @@ public class JBusInterface extends HAObject implements Runnable {
 			if(t!=null) {
 				try {
 					polling_interval_  = t.getIntValue();
+				} catch (DataConversionException e) {
+					Output.error(e);
+				}
+			}
+
+			t = el.getAttribute("discover");
+			if(t!=null) {
+				try {
+					if( t.getBooleanValue() )
+						discover();
 				} catch (DataConversionException e) {
 					Output.error(e);
 				}
@@ -187,14 +213,38 @@ public class JBusInterface extends HAObject implements Runnable {
 				}
 				
 				Message msg;
-				while( driver_!=null && (msg=driver_.getMessage())!=null ) {
-					f
+				try {
+					while( driver_!=null && (msg=driver_.getMessage())!=null ) {
+						
+						try {
+							int id = msg.getId();
+							if( connections_.containsKey(id)) {
+								JBusNode con = connections_.get(id);
+								
+								con.parseMessage(msg);
+							}
+							else {	//not here yet
+								JBusNode node = new JBusNode(getUser(), getGroup(), this, id, this);
+								node.setId("node"+id);
+								add(node);
+								connections_.put(id, node);
+							}
+						} catch (Exception e) {
+							status_.setStatus(Right.getGlobalUser("ui"), STATUS.WARNING, e.toString());
+						}
+					}
+				} catch (Exception e) {
+					status_.setStatus(Right.getGlobalUser("ui"), STATUS.ERROR, e.toString());
 				}
 
 				ms = 100000;
 				for(Map.Entry<Integer, JBusNode> n : connections_.entrySet()) {
 					if( n.getValue().getPolled()+n.getValue().getPollingMs() - Calendar.getInstance().getTimeInMillis() <= 0) {
-						addMessage(n.getValue().createPollingMsg());
+						try {
+							addMessage(n.getValue().createPollingMsg());
+						} catch (Exception e) {
+							status_.setStatus(Right.getGlobalUser("ui"), STATUS.WARNING, e.toString());
+						}
 					}
 				}
 
@@ -203,6 +253,8 @@ public class JBusInterface extends HAObject implements Runnable {
 				for(Map.Entry<Integer, JBusNode> n : connections_.entrySet()) {
 					ms = Math.min(ms, n.getValue().getPolled()+n.getValue().getPollingMs() - Calendar.getInstance().getTimeInMillis());
 				}
+				
+				doDiscover();
 			}
 
 		}
