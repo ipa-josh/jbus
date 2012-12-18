@@ -5,5 +5,7 @@
 	<classpathentry kind="lib" path="C:/Users/Josh/Google Drive/JHA/Server SW/jdom-2.0.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Josh/Google Drive/JHA/Server SW/sqlite4java.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Josh/Google Drive/JHA/libs/rxtx-2.1-7-bins-r2/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="SunriseSunsetCalculator-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Josh/Google Drive/JHA/Server SW/json-simple-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
