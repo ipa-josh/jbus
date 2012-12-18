@@ -7,6 +7,7 @@ import rights.User;
 
 import common.Attribute;
 import common.HAObject;
+import common.HAObject.SubPaths;
 import common.Path;
 
 import jibble.simplewebserver.SimpleWebServer.PathHandle;
@@ -49,8 +50,13 @@ public class LookUp implements PathHandle {
 			return "{}";
 
 		Vector<String> adds = new Vector<String>();
-		if(o.getClass().equals(HAObject.class)||o.getClass().equals(root_class)) {
-			Vector<Path> paths = ((HAObject)o).getSubs(user);
+		Object data = null;
+		if(HAObject.class.isAssignableFrom(o.getClass()))
+			data = ((HAObject)o).get(user,null);
+		//if(o.getClass().equals(HAObject.class)||o.getClass().equals(root_class)) {
+			//Vector<Path> paths = ((HAObject)o).getSubs(user);
+		if( data!=null && data.getClass().equals(SubPaths.class)) {
+			Vector<Path> paths = ((SubPaths)data).paths;
 			String r="";
 			for(int i=0; i<paths.size(); i++)
 				r+=(i==0?"":",")+"\""+paths.get(i).toString()+"\"";

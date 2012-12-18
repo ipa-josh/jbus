@@ -59,10 +59,21 @@ public class HAObject extends Attribute {
 		}
 		return r;
 	}
+	
+	public static class SubPaths {
+		public Vector<Path> paths;
+		
+		public SubPaths(Vector<Path> p) {
+			paths=p;
+		}
+	}
 
 	@Override
 	protected Object _get(User usr, Object v) {
-		if(v==null || !Path.class.equals(v.getClass()))
+		if(v==null)
+			return new SubPaths(getSubs(usr));
+		
+		if(!Path.class.equals(v.getClass()))
 			return null;
 
 		Path pth = (Path)v;
