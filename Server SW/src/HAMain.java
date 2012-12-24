@@ -15,12 +15,11 @@ public class HAMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		/*if(args.length<1) {
+		if(args.length<1) {
 			System.out.println("spedify file to load");
 			return;
 		}
-		String fn = args[0];*/
-		String fn = "demo.xml";
+		String fn = args[0];
 		
 		Command.sFn_ = fn;
 		
