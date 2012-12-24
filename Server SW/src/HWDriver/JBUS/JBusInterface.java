@@ -225,6 +225,7 @@ public class JBusInterface extends HAObject implements Runnable {
 							}
 							else {	//not here yet
 								JBusNode node = new JBusNode(getUser(), getGroup(), this, id, this);
+								node.setPollingMs(polling_interval_);
 								node.setId("node"+id);
 								add(node);
 								connections_.put(id, node);
