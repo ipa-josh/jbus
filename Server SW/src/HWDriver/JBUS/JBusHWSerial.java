@@ -66,7 +66,6 @@ public class JBusHWSerial implements JBusHW, SerialPortEventListener {
 			}
 		}
 		
-		out_.write(RECV_CON);
 	}
 
 	private Vector<Byte> buffer_ = new Vector<Byte>();
@@ -130,7 +129,7 @@ public class JBusHWSerial implements JBusHW, SerialPortEventListener {
 	@Override
 	public void sendMessage(Message msg) throws Exception {
 		int size = msg.length();
-		if( (size&(~SEND_MASK)) > 0)
+		if( (size&SEND_MASK) > 0)
 			throw new Exception("too long for sending");
 		
 		int len = (size+7)/8;

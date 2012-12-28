@@ -43,13 +43,13 @@ public class JBusInterface extends HAObject implements Runnable {
 		public void add(byte val, int no_bits) throws Exception {
 			if(no_bits>8)
 				throw new Exception("max. 8 bits are allowed");
-			val <<= (8-no_bits);
+
 			if(size_%8==0)
 				bytes_.add( val );
 			else {
-				bytes_.set(bytes_.size()-1, (byte) (bytes_.lastElement().byteValue() | (val>>(size_%8))) );
+				bytes_.set(bytes_.size()-1, (byte) (bytes_.lastElement().byteValue() | (val<<(size_%8))) );
 				if( 8-size_%8 < no_bits )
-					bytes_.add( (byte) (val<<(8-size_%8)) );
+					bytes_.add( (byte) (val>>(8-size_%8)) );
 			}
 			size_ += no_bits;
 		}
@@ -79,7 +79,12 @@ public class JBusInterface extends HAObject implements Runnable {
 					j+=8;
 				}
 			}
-			return r;
+			
+			int mask=0;
+			for(int i=0; i<len; i++)
+				mask|=(1<<i);
+			
+			return r&mask;
 		}
 	}
 
@@ -147,6 +152,9 @@ public class JBusInterface extends HAObject implements Runnable {
 				if(hw.equals("serial")) {
 					driver_ = new JBusHWSerial(this, el);
 				}
+				else if(hw.equals("console")) {
+					driver_ = new JBusHWConsole(this, el);
+				}
 			} catch (Exception e) {
 				status_.setStatus(Right.getGlobalUser("ui"), Attr_Error.STATUS.ERROR, e.toString());
 			}
@@ -158,6 +166,13 @@ public class JBusInterface extends HAObject implements Runnable {
 		}
 
 		(new Thread(this)).start();
+		
+		while(discoverID_>=0) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
 		return true;
 	}
 
@@ -191,27 +206,29 @@ public class JBusInterface extends HAObject implements Runnable {
 		if(driver_==null)
 			status_.setStatus(Right.getGlobalUser("ui"), STATUS.WARNING, "not connected");
 
-		for(Message msg : buffer_) {
+		while(buffer_.size()>0) {
 			try {
-				driver_.sendMessage(msg);
+				driver_.sendMessage(buffer_.get(0));
 			} catch (Exception e) {
 				status_.setStatus(Right.getGlobalUser("ui"), STATUS.WARNING, e.toString());
 			}
+			buffer_.remove(0);
 		}
 	}
 
 	@Override
 	public void run() {
+		long ms = 0;
 
 		while(true) {
-			long ms = 100000;
 
 			synchronized (this) {
-				try {
-					wait(ms);
-				} catch (InterruptedException e) {
-				}
-				
+				if(ms>0)
+					try {
+						wait(ms);
+					} catch (InterruptedException e) {
+					}
+
 				Message msg;
 				try {
 					while( driver_!=null && (msg=driver_.getMessage())!=null ) {
@@ -250,12 +267,15 @@ public class JBusInterface extends HAObject implements Runnable {
 				}
 
 				sendBuffer();
+				
+				doDiscover();
 
 				for(Map.Entry<Integer, JBusNode> n : connections_.entrySet()) {
 					ms = Math.min(ms, n.getValue().getPolled()+n.getValue().getPollingMs() - Calendar.getInstance().getTimeInMillis());
 				}
 				
-				doDiscover();
+				if(buffer_.size()>0)
+					ms = 0;
 			}
 
 		}
