@@ -8,7 +8,9 @@ void jbus_init();
 //returns 0 on success
 char jbus_error();
 char jbus_sending();
+char jbus_can_send();
 void jbus_send(volatile const u8 l);
+void jbus_sendI(volatile const u8 l);
 void jbus_sendW(volatile const u8 l);	//waits 5ms before sending
 
 //called on successful send

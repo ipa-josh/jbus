@@ -14,8 +14,8 @@ void setTimeJB(unsigned char t)
 	TIME_0=t;
 }*/
 
-#define ACTIVE_TIMER() {TIFR&=~RESET_TIMER;TIMSK |= (1<<TOIE);softuart_disable();}
-#define INACTIVE_TIMER() {TIMSK &= ~(1<<TOIE1);softuart_enable();}
+#define ACTIVE_TIMER() {TIFR|=RESET_TIMER;TIMSK |= (1<<TOIE);/*softuart_disable();*/}
+#define INACTIVE_TIMER() {TIMSK &= ~(1<<TOIE1);/*softuart_enable();*/}
 
 
 #define TIMER_INTERRUPT TIM1_OVF_vect
@@ -38,7 +38,8 @@ void setTimeJB(unsigned char t)
 #define TOIE TOIE0
 #define TIMSK TIMSK0
 #define RESET_TIMER ((1<<OCF0B)|(1<<OCF0A)|(1<<TOV0))
-#define PRESCALER (1<<CS01)|(1<<CS00)	//64
+#define PRESCALER ((1<<CS01)|(1<<CS00))	//64
+//#define PRESCALER (1<<CS01)	//8
 #define TCNT TCNT0
 
 #define TIM1_OVF_vect TIMER0_OVF_vect
@@ -95,12 +96,13 @@ volatile u8 data[16];
 
 void jbus_init() {
 	// Timer 1 konfigurieren
-	OCR1A = 0;
+	//OCR1A = 0;
 	TCCR1 = PRESCALER;//|(1<<CTC1); // Prescaler 64
 	//TCCR0B = 3; // Prescaler 64 
 
 	//ACTIVE_TIMER();
 
+	PPORT&=~(1<<PIN);	//no pullup, output low
 	PIN_MSK |= (1<<PIN);	//enable int. on pin
 
 	meta=0;
@@ -118,12 +120,36 @@ char jbus_sending() {
 	return (meta&0xc0)==0x80;
 }
 
+char jbus_can_send() {
+	return ( (meta&0x40)==0 && PPIN);
+}		
+
+void jbus_sendW(volatile const u8 l) {
+	while(!PPIN) ;
+	/*#ifndef EN_UART
+	_delay_us(300);
+	#endif*/
+	jbus_send(l);
+}	
+
+void jbus_sendI(volatile const u8 l) {
+	while(!PPIN) ;
+	
+	if( (meta&0x40)==0 && PPIN) {
+		meta=0x80;
+		off=0xfe;
+		len=l;
+  		//TCNT = 200; //start sending fast
+		//ACTIVE_TIMER();
+	}
+}	
+
 void jbus_send(volatile const u8 l) {
 	if( (meta&0x40)==0 && PPIN) {
 		meta=0x80;
-		off=0xff;
+		off=0xfe;
 		len=l;
-  		TCNT = 255;//
+  		TCNT = 200; //start sending fast
 		ACTIVE_TIMER();
 	}
 	else {
@@ -135,9 +161,9 @@ void jbus_send(volatile const u8 l) {
 ISR (PIN_VEC)
 {
 	if( (meta&0xc0)==0 && !PPIN) {
-		TCNT = 256-TIME_0/2;//256-(TIME_0*2+TIME_0/2);
+		TCNT = 256-(TIME_0/2);
 		meta=0x40;
-		len=0xff;
+		len=0xfe;
 		ACTIVE_TIMER();
 	}
 	else if( (meta&0xc0)!=0x40 ) {
@@ -155,14 +181,13 @@ ISR (PIN_VEC)
 }
 
 void jb0() {
-	PDDR|=(1<<PIN);
-	PPORT&=~(1<<PIN);
 	meta&=~LAST;
+	PDDR|=(1<<PIN);
 }
 
 void jb1() {
-	PDDR&=~(1<<PIN);
 	meta|=LAST;
+	PDDR&=~(1<<PIN);
 }
 
 ISR (TIM1_OVF_vect)
@@ -211,24 +236,23 @@ ISR (TIM1_OVF_vect)
 	else if( (meta&0xc0)==0x80 ) {
 		GIMSK  &= ~EN_INT;
 		if(off<len) {
-			u8 s=data[off>>3]&(1<<(off&7));
+			u8 s= (data[off>>3]&(1<<(off&7)));
 			if( meta&WHICH ) {
-				if( s )
+				if( s!=0 )
 					jb0();
 				else
 					jb1();
 				++off;
-				meta&=~WHICH;
 			}
 			else {
-				if( s ) {
+				if( s!=0 ) {
 					jb1();
 					meta^=PAR;}
 				else {
 					jb0();
 				}
-				meta|=WHICH;
 			}
+			meta^=WHICH;
 		}
 		else if( len+2==off ) {
 			meta=0;
@@ -252,7 +276,7 @@ ISR (TIM1_OVF_vect)
 
 done:
 	meta=0;
-
+	
 	jbus_on_receive(data,len);
 
 	return;

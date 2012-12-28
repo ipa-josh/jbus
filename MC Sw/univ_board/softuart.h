@@ -6,15 +6,15 @@
 #define F_CPU 3686400UL
 #endif
 
-#define SOFTUART_BAUD_RATE      2400
+#define SOFTUART_BAUD_RATE      9600
 
-#define SOFTUART_RXPIN   PINB
-#define SOFTUART_RXDDR   DDRB
-#define SOFTUART_RXBIT   PB0
+#define SOFTUART_RXPIN   PINC
+#define SOFTUART_RXDDR   DDRC
+#define SOFTUART_RXBIT   PC2
 
-#define SOFTUART_TXPORT  PORTB
-#define SOFTUART_TXDDR   DDRB
-#define SOFTUART_TXBIT   PB1
+#define SOFTUART_TXPORT  PORTC
+#define SOFTUART_TXDDR   DDRC
+#define SOFTUART_TXBIT   PC3
 
 #define SOFTUART_T_COMP_LABEL      TIMER1_COMPA_vect
 #define SOFTUART_T_COMP_REG        OCR1A
@@ -25,8 +25,8 @@
 
 #define SOFTUART_CMPINT_EN_MASK    (1<<OCIE1A)
 
-#define SOFTUART_CTC_MASKA         (1<<WGM12)
-#define SOFTUART_CTC_MASKB         (0)
+#define SOFTUART_CTC_MASKA         (0)
+#define SOFTUART_CTC_MASKB         (1<<WGM12)
 
 /* "A timer interrupt must be set to interrupt at three times 
    the required baud rate." */

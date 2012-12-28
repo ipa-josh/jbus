@@ -6,10 +6,13 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		default|AVR = default|AVR
+		uart|AVR = uart|AVR
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BF1E34E9-6497-4A97-8C72-93F68274C86B}.default|AVR.ActiveCfg = default|AVR
 		{BF1E34E9-6497-4A97-8C72-93F68274C86B}.default|AVR.Build.0 = default|AVR
+		{BF1E34E9-6497-4A97-8C72-93F68274C86B}.uart|AVR.ActiveCfg = uart|AVR
+		{BF1E34E9-6497-4A97-8C72-93F68274C86B}.uart|AVR.Build.0 = uart|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

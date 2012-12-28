@@ -8,6 +8,8 @@
 //#define _DEBUG_LED
 #define _MINIMAL
 
+#define UNBOUNCING_VAL 255
+
 #define READ	0
 #define WRITE	1
 #define CONFIG	2
@@ -16,15 +18,15 @@
 #define INPUT_PULLUP	1
 #define OUTPUT			2
 #define PWM				3
-	
+
 #ifdef EN_UART
 volatile char connected=0;
 
 
 void ToHost_Transmit_Byte( unsigned char data )
 {
-	if(connected)
-		softuart_putchar(data);
+	//if(connected)
+	softuart_putchar(data);
 }
 #else
 
@@ -51,10 +53,6 @@ int main( void )
   	jbus_init();
 	init();
 
-#ifndef _MINIMAL
-	_delay_ms(30000);
-#endif
-
   	// Global Interrupts aktivieren
 	sei();
 
@@ -63,6 +61,7 @@ int main( void )
 	}
 }
 
+#ifndef EN_UART
 void load_config() {
 	uint8_t i, data;
 	
@@ -121,11 +120,13 @@ void load_config() {
 		}
 	}
 }
+#endif
 
 void init() {
 #ifdef EN_UART
 	softuart_init( );
 #else
+	ADCSRA = (1<<ADEN)|(1<<ADPS2);            // enable ADC, prescaler 16
 	load_config();
 #endif
 #ifdef _DEBUG_LED
@@ -139,9 +140,9 @@ void periodic() {
 #ifdef EN_UART
 
 	unsigned char cdata;
-	//static u8 buffer[16]={};
-	static u8 len=0, off=0;
-	int temp=0;
+	static u8 buffer[16];
+	static u8 len=0, off=0, i;
+	//int temp=0;
 
 	/*//_delay_ms(30000);
 	data='A';
@@ -151,7 +152,7 @@ void periodic() {
 		_delay_ms(500);}*/
 
 	
-	while( !softuart_kbhit() ) {
+	/*while( !softuart_kbhit() ) {
 
 		temp++;
 		if(temp>10000) {
@@ -162,24 +163,33 @@ void periodic() {
 			off=len=0;
 		}
 		_delay_ms(1);
-	}
+	}*
+	
+	while(1)
+		if(softuart_kbhit()) {
+			ToHost_Transmit_Byte(softuart_getchar()+1);
+		}	*/		
 
 	cdata=softuart_getchar();
-	//ToHost_Transmit_Byte(cdata);
+	
+	/*//ToHost_Transmit_Byte(cdata);
 
 	if(!connected) {
 		if(cdata==RECV_CON) {
 			connected = 1;
 #ifdef _DEBUG_LED
+#error
 			PORTB &= ~(1<<PB4);
 #endif
 		}
 	}
-	else {
+	else*/ {
 		if(len) {
-			data[(off>>3)]=cdata;
+			buffer[(off>>3)]=cdata;
 			off+=8;
 			if(off>=len) {
+				for(i=0; i<(off>>3); i++)
+					data[i] = buffer[i];
 				jbus_send(len);
 				
 				off=len=0;
@@ -196,7 +206,12 @@ void periodic() {
 
 	}
 #else
-	uint8_t i=0;
+	static uint16_t old_port = 0;//((PINC&0x3F)|((PINB<<4)&0xC0))|(((PINB>>4)&0x03)<<8);
+	static uint8_t cnt[PINS_NUMBER] = {};
+		
+	uint8_t i=0, send=0;
+	uint16_t port = ((PINC&0x3F)|((PINB<<4)&0xC0))|(((PINB>>4)&0x03)<<8);
+	
 	for(i=0; i<PINS_NUMBER; i++) {
 		if( ((configuration[1+i/2]>>(i&1?4:0))&0x03)==PWM ) {
 			if(val_pwm[i]>=conf_pwm[i]) {
@@ -214,7 +229,36 @@ void periodic() {
 			
 			val_pwm[i]++;
 		}
+		else if( ((configuration[1+i/2]>>(i&1?4:0))&0x03)==INPUT || ((configuration[1+i/2]>>(i&1?4:0))&0x03)==INPUT_PULLUP ) {
+			
+			if( (old_port^port)&(1<<i) ) {
+				cnt[i] = UNBOUNCING_VAL;
+			}
+			
+			if(cnt[i]==1)
+				send = 1;
+			if(cnt[i]>0) 
+				--cnt[i];
+		}			
 	}
+	
+	if(send!=0) {
+		while(!jbus_can_send()); //wait till can send
+		
+		cli();
+		data[0] = JB_ID|(READ<<6);
+		*(uint16_t*)(data+1) = port;
+		jbus_send(8+10);
+		sei();
+	}
+	
+	old_port = port;
+	
+	/*static uint8_t t=0;
+	++t;
+	data[0]=t;
+	jbus_send(8);
+	_delay_ms(30);*/
 #endif
 }
 
@@ -229,7 +273,7 @@ void jbus_on_done(volatile u8 *data, volatile u8 len) {
 //called on unsucessful send
 void jbus_on_failure(volatile u8 *data, volatile u8 len) {
 	#ifdef EN_UART
-	ToHost_Transmit_Byte(SEND_FAILED);
+	ToHost_Transmit_Byte(RECV_FAILED);
 	#else
 	#endif
 }
@@ -249,18 +293,19 @@ void jbus_on_receive(volatile u8 *data, volatile u8 len) {
 				if(len==0+8) { //read inputs
 					data[1] = (PINC&0x3F)|((PINB<<4)&0xC0);
 					data[2] = (PINB>>4)&0x03;
-					jbus_send(8+10);
+					jbus_sendI(8+10);
 				}
 				else if(len==3+8) {//read analog
 					// Kanal waehlen, ohne andere Bits zu beeinfluﬂen
-					ADMUX = (data[1]&0x07);
+					ADMUX = ((1<<REFS0)|(data[1]&0x07));
+					//external ref.
 					ADCSRA |= (1<<ADSC);            // eine Wandlung "single conversion"
 					while (ADCSRA & (1<<ADSC) )     // auf Abschluss der Konvertierung warten
 					;
 					ad=ADCW;
 					data[1] = (data[1]&0x07)|(ad<<3);
 					data[2] = (ad>>5)&0x1F;
-					jbus_send(8+3+10);
+					jbus_sendI(8+3+10);
 				}
 				break;
 				
@@ -281,10 +326,10 @@ void jbus_on_receive(volatile u8 *data, volatile u8 len) {
 					eeprom_write_block (data, ee_configuration, CONFIG_SIZE);
 					load_config();
 				}
-				else if(len==0) {
+				else if(len==8) {
 					for(i=0; i<sizeof(configuration); i++)
 						data[i] = configuration[i];
-					jbus_send(8*sizeof(configuration));
+					jbus_sendI(8*sizeof(configuration));
 				}				
 				break;
 /*
@@ -292,14 +337,14 @@ void jbus_on_receive(volatile u8 *data, volatile u8 len) {
 			if(len==8+5)
 			PORTA= ((data[1]&0x1F)<<2)|(PORTA&0x83);
 			data[1]= (PORTA&0x7C)>>2;
-			jbus_sendW(8+5);
+			jbus_sendI(8+5);
 			break;
 
 			case 0x80:	//Leinwand-Ziel
 			if(len==8+8)
 			LeinwandAim = data[1];
 			data[1]= LeinwandAim;
-			jbus_sendW(8+8);
+			jbus_sendI(8+8);
 			break;
 
 			case 0xC0:	//Temperatur auslesen
@@ -312,12 +357,12 @@ void jbus_on_receive(volatile u8 *data, volatile u8 len) {
 			ad=ADCW;
 			data[1] = ad&0xff;;
 			data[2] = (ad>>8)&0x03;
-			jbus_sendW(data, 8+10);
+			jbus_sendI(data, 8+10);
 			break;*/
 		}
 	}
-	else if(len==5 && JB_ID==(data[0]&0x3F))
-		jbus_send(5);
+	else if(len==6 && JB_ID==(data[0]&0x3F))
+		jbus_sendI(6);
 #endif
 }
 
