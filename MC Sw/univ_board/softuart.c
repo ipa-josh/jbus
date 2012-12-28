@@ -292,13 +292,12 @@ void softuart_flush_input_buffer( void )
 	qin  = 0;
 	qout = 0;
 }
-
+*/
 	
 unsigned char softuart_can_transmit( void ) 
 {
 	return ( flag_tx_ready );
 }
-*/
 void softuart_putchar( const char ch )
 {
 	if ( flag_tx_ready ) {
@@ -323,7 +322,7 @@ void softuart_enable() {
 
 void softuart_disable(){
 	SOFTUART_T_INTCTL_REG &= ~SOFTUART_CMPINT_EN_MASK;
-	flag_rx_waiting_for_stop_bit = flag_tx_ready = flag_rx_ready = SU_FALSE;
+	flag_rx_waiting_for_stop_bit = flag_rx_ready = SU_FALSE; //flag_tx_ready = 
 }
 
 #endif
