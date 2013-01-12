@@ -96,6 +96,7 @@ public class Right {
 
 			users_.get(3).addGroup(new Group("admin"));
 			users_.get(3).addGroup(new Group("ui"));
+			users_.get(3).addGroup(new Group("hw"));
 		}
 	}
 
