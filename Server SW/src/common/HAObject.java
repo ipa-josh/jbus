@@ -109,7 +109,9 @@ public class HAObject extends Attribute {
 		return addXML(el);
 	}
 
-	public boolean addXML(Element el) {	
+	public boolean addXML(Element el) {
+		ConnectionInst.get().readXML(el, getAbsoluteId());
+		
 		ts_change_=Calendar.getInstance().getTimeInMillis();
 
 		for( Element sub : el.getChildren())
@@ -153,7 +155,7 @@ public class HAObject extends Attribute {
 			}
 		}
 
-		for( Element sub : el.getChildren())
+		/*for( Element sub : el.getChildren())
 		{
 			if(!sub.getName().equals("connection"))
 				continue;
@@ -216,7 +218,7 @@ public class HAObject extends Attribute {
 			}
 			else
 				Output.error("could not connect "+ta.getValue()+" and "+tb.getValue() + " ("+(a==null?"0":"1")+(b==null?"0":"1")+")");
-		}
+		}*/
 
 		ts_change_=Calendar.getInstance().getTimeInMillis();
 
