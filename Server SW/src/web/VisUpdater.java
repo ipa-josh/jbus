@@ -7,7 +7,6 @@ import rights.User;
 import jibble.simplewebserver.SimpleWebServer.PathHandle;
 import common.Attribute;
 import common.Callback;
-import common.Path;
 
 public class VisUpdater implements Callback, PathHandle {
 	private long timeout_ = 10000;

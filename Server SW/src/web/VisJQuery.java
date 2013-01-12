@@ -9,9 +9,6 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-import rights.Right;
-
-import common.HAObject;
 import common.Output;
 
 import jibble.simplewebserver.SimpleWebServer.PathHandle;
