@@ -24,6 +24,7 @@ public class Command extends HAObject implements Callback {
 
 	public Command(User usr, Group grp, Attribute parent) {
 		super(Right.getGlobalUser("admin"), Right.getGlobalUser("admin").getFirstGroup(), parent);
+		setVisualization("cmd");
 	}
 
 	@Override
@@ -45,21 +46,35 @@ public class Command extends HAObject implements Callback {
 	@Override
 	public boolean onAttributeChanged(Attribute attr) {
 		if(attr.getId().startsWith("reboot")) {
-			final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+			/*final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
 
-			/* Build command: java -jar application.jar */
+			/* Build command: java -jar application.jar *
 			final ArrayList<String> command = new ArrayList<String>();
 			command.add(javaBin);
 			command.add("-jar");
 			command.add("JHA.jar");
 			command.add(sFn_);
+			command.add("1000");
 
-			final ProcessBuilder builder = new ProcessBuilder(command);
+			/*final ProcessBuilder builder = new ProcessBuilder(command);
 			try {
 				builder.start();
 			} catch (IOException e) {
 				Output.error(e);
+			}*
+
+			String cmd="";
+			for(String s : command)
+				cmd+="\""+s+"\" ";
+	        try {
+				Runtime.getRuntime().exec(cmd);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+			
+			System.out.println("Reboot: now");
+			System.out.println(cmd);*/
+			
 			System.exit(0);
 		}
 		return false;
