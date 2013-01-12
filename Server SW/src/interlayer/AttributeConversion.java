@@ -34,14 +34,17 @@ public class AttributeConversion implements Callback {
 			return attr_b_.set(user_, attr_a_.get(user_));
 		}
 		else if(attr==attr_b_) {
-			return attr_a_.set(user_, attr_b_.get(user_));
+			return true;//attr_a_.set(user_, attr_b_.get(user_));
 		}
 		return false;
 	}
 
 	@Override
 	public boolean required() {
-		return true;
+		return false;
 	}
+	
+	public Attribute getIn() {return attr_a_;}
+	public Attribute getOut() {return attr_b_;}
 
 }
