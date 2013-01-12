@@ -10,7 +10,9 @@ gl_vis_temp['sunset'] = {
 			col="FF"+n.toString(16)+"00";
 		else
 			col=(255-n).toString(16)+"0000";
-		alert(col);
+		//alert(col);
 		$("#body").css('background-color','#'+col);
+	},
+	edit: function($this, vis) {
 	}
 }
