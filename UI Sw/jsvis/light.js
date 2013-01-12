@@ -13,12 +13,10 @@ gl_vis_temp['light'] = {
 						v=true;
 					else
 						v=false;
-					$this.JHA('set',
-							{
-						path: $this.data('path')+'/status/'+v,
-						reload: [$this.data('path')+'/status']
-							})
+					$this.JHA('set', 'status/'+v)
 				});
+				
+		if(history) history.add($this.data('path')+"/status");
 	},
 	vis: function($this, vis) {
 		var v=$this.JHA('getChild',{name:"status"}).data('data')

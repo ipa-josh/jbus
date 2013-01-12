@@ -2,28 +2,24 @@ package HWDriver.SUNSET;
 
 import java.util.Calendar;
 
-import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 
 import rights.Group;
-import rights.Right;
 import rights.User;
-
-import HWDriver.JBUS.JBusHWSerial;
 
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import common.Attribute;
 import common.HAObject;
-import common.Output;
 import common.attributes.Attr_Double;
-import common.attributes.Attr_Error;
 
 public class Sunset extends HAObject implements Runnable
 {
 	public Sunset(User usr, Group grp, Attribute parent) {
 		super(usr, grp, parent);
+		
+		setVisualization("sunset");
 	}
 
 	private Location location_ = new Location("52", "13");
@@ -102,7 +98,7 @@ public class Sunset extends HAObject implements Runnable
 		while(true) {
 			sun_.set(getUser(), new Double(get()));
 			
-			long ms = 100000;
+			long ms = 15*60*1000;
 			synchronized (this) {
 				try {
 					wait(ms);

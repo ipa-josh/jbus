@@ -7,8 +7,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import HWDriver.AVRNETIO.AvrNetIo;
-
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import com.almworks.sqlite4java.SQLiteJob;
@@ -20,18 +18,18 @@ import rights.User;
 
 import common.Attribute;
 import common.Callback;
-import common.HAObject;
-import common.Path;
 import common.PathWithData;
 
-import jibble.simplewebserver.SimpleWebServer.PathHandle;
-
 public class LogSqLite implements Callback {
-	Attribute root_ = null;
-	SQLiteQueue queue_ = null;
-	boolean capture_ = false;
+	private Attribute root_ = null;
+	private SQLiteQueue queue_ = null;
+	private boolean capture_ = false;
+	private static LogSqLite inst_ = null;
 
 	public LogSqLite(Attribute root, String fn) {
+		inst_ = this;
+		java.util.logging.Logger.getLogger("com.almworks.sqlite4java").setLevel(java.util.logging.Level.WARNING); 
+		
 		root_ = root;
 
 		queue_ = new SQLiteQueue(new File(fn));
@@ -49,15 +47,22 @@ public class LogSqLite implements Callback {
 			if(!capture_)
 				return;
 		}
+		
+		if(!attr.canRead(usr))
+			return;
+		
 		//YYYY-MM-DD HH:MM:SS.SSS
 		queue_.execute(new SQLiteJob<Object>() {
 			protected Object job(SQLiteConnection connection) throws SQLiteException {
-				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-				//System.out.println("INSERT INTO history VALUES('"+attr.getAbsoluteId()+"','"+attr.get(usr)+"',julianday('"+fmt.format(utime)+"'))");
+				Object obj = attr.get(usr);
+				if(obj==null)
+					return null;
 				
+				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
 			    SQLiteStatement st = connection.prepare("INSERT INTO history VALUES(?,?,julianday('"+fmt.format(utime)+"'))");
 			    st.bind(1, attr.getAbsoluteId());
-			    st.bind(2, attr.get(usr).toString());
+			    st.bind(2, obj.toString());
 			    st.stepThrough();
 
 				return null;
@@ -65,9 +70,54 @@ public class LogSqLite implements Callback {
 		});
 	}
 
+	public Vector<String> query(final Attribute attr, final User usr, final String condition) {
+		if(!attr.canRead(usr))
+			return new Vector<String>();
+		
+		//YYYY-MM-DD HH:MM:SS.SSS
+		return queue_.execute(new SQLiteJob<Vector<String> >() {
+			protected Vector<String> job(SQLiteConnection connection) throws SQLiteException {
+			    SQLiteStatement st = connection.prepare("SELECT data, utime FROM history WHERE id=? "+condition);
+			    st.bind(1, attr.getAbsoluteId());
+			    
+				Vector<String> r = new Vector<String>();
+			    while(st.step()) {
+			    	r.add( st.columnString(0) );
+			    	r.add( st.columnString(1) );
+			    }
+
+				return r;
+			}
+		}).complete();
+	}
+
+	public Vector<String> queryex(final Attribute attr, final User usr, final long _from_secs, final long _to_secs, final boolean avg) {
+		if(!attr.canRead(usr))
+			return new Vector<String>();
+		
+		//YYYY-MM-DD HH:MM:SS.SSS
+		return queue_.execute(new SQLiteJob<Vector<String> >() {
+			protected Vector<String> job(SQLiteConnection connection) throws SQLiteException {
+				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+				double from_secs = _from_secs/(24.*3600.);
+				double to_secs   = _to_secs/(24.*3600.);
+				
+			    SQLiteStatement st = connection.prepare("SELECT "+(avg?"AVG(CAST(data AS Float)), AVG(utime)":"data, utime")+" FROM history WHERE id=? AND utime BETWEEN (julianday('"+fmt.format(new Date())+"')"+(from_secs>=0?"+":"")+from_secs+") AND (julianday('"+fmt.format(new Date())+"')"+(to_secs>=0?"+":"")+to_secs+")");
+			    st.bind(1, attr.getAbsoluteId());
+			    
+				Vector<String> r = new Vector<String>();
+			    while(st.step()) {
+			    	r.add( st.columnString(0) );
+				    r.add( st.columnString(1) );
+			    }
+
+				return r;
+			}
+		}).complete();
+	}
+
 	@Override
 	public boolean onAttributeChanged(Attribute attr) {
-		System.out.println(attr.getAbsoluteId());
 		Date d = new Date();
 		synchronized(this) {
 			log(attr, d, Right.getGlobalUser("ui"));

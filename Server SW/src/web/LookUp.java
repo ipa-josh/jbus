@@ -2,8 +2,7 @@ package web;
 
 import java.util.Vector;
 
-import rights.Right;
-import rights.User;
+import org.json.simple.JSONValue;
 
 import common.Attribute;
 import common.HAObject;
@@ -67,7 +66,7 @@ public class LookUp implements PathHandle {
 			return Attribute2JSon((Attribute)o,adds);
 		}
 		else
-			return "{\"base\":\"data\",\"data\":\""+o.toString()+"\"}";
+			return "{\"base\":\"data\",\"data\":\""+JSONValue.escape(o.toString())+"\"}";
 	}
 
 }

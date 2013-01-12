@@ -19,6 +19,9 @@ void jbus_on_done(volatile u8 *data, volatile u8 len);
 //called on unsucessful send
 void jbus_on_failure(volatile u8 *data, volatile u8 len);
 
+//called on unsucessful send
+void jbus_on_failure_send(volatile u8 *data, volatile u8 len);
+
 //called on finished receive
 void jbus_on_receive(volatile u8 *data, volatile u8 len);
 

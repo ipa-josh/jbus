@@ -1,13 +1,8 @@
 package web;
 
-import java.util.Vector;
-
-import rights.Right;
-import rights.User;
+import java.net.URLDecoder;
 
 import common.Attribute;
-import common.HAObject;
-import common.Path;
 import common.PathWithData;
 
 import jibble.simplewebserver.SimpleWebServer.PathHandle;
@@ -27,10 +22,11 @@ public class Setter implements PathHandle {
 
 	@Override
 	public String onRequest(String url, rights.User user) {
-		Vector<String> adds = new Vector<String>();
 		PathWithData p = new PathWithData();
 		p.parseString(url.substring(getPath().length()));
 		p.fromPath();
+		
+		p.setData( URLDecoder.decode((String) p.getData()) );
 		
 		if(root_!=null) {
 			return ""+root_.set(user, p);

@@ -1,12 +1,11 @@
 var gl_vis_temp={};
 
-
 (function( $ ) {
 	var debug=true;
 
 	function loadVisData(name) {
 		if(name in gl_vis_temp)
-			return gl_vis_temp[name]
+			return gl_vis_temp[name];
 
 		$.ajax({
 			url: "jsvis/"+name+".js",
@@ -16,7 +15,7 @@ var gl_vis_temp={};
 			success: function(data) {
 			},
 			error: function(a,b,c) {
-				alert("e1: "+a+b+c);
+				alert("could not load vis for "+name);
 			}
 		});
 
@@ -54,7 +53,7 @@ var gl_vis_temp={};
 								},
 								success: function(data) {
 									options = $.extend(options, data);
-
+									
 									$this.data("vis",options);
 									loadVisData(options['vis']).init($this);
 									$this.JHAVis('update');
@@ -72,7 +71,7 @@ var gl_vis_temp={};
 				});
 			},
 
-			update:  function(data) {
+			update:  function() {
 				return this.each(function(){
 					try {
 						var vis = $(this).data('vis');

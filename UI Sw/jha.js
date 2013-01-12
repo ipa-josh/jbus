@@ -73,7 +73,7 @@ if(!on_new_element) var on_new_element = function() {};
 					$(this).append("<div id='"+id+"' style='position:absolute'/>");
 					map[data.path] = id;
 					//alert(data.path);
-					$("#"+id).JHA(data)
+					$("#"+id).JHA(data);
 				});
 			},
 
@@ -85,6 +85,10 @@ if(!on_new_element) var on_new_element = function() {};
 
 			getChild:  function(data) {
 				return $("#"+map[$(this).data('path')+"/"+data.name]);
+			},
+
+			getFromAbsPath:  function(path) {
+				return $("#"+map[path]);
 			},
 
 			getAllChildren:  function() {
@@ -107,25 +111,29 @@ if(!on_new_element) var on_new_element = function() {};
 						},
 						success: function(res) {
 							error_handler.clear("communication");
-
-							if(res) {
-								/*alert(data.path);
-								for(v in data.reload)
-									alert(data.reload[v]);*/
-								/*for(v in data.reload) {
-									alert(data.reload[v]);
-									$("#"+map[data.reload[v]]).JHA({
-										path: $("#"+map[data.reload[v]]).data("path"),
-										sync: true
-									});
-								}
-								$this.JHAVis('update')*/
-							}
-
 						}
 					});
 				});
 
+			},
+
+			history:  function(param) {
+				var ret;
+				var $this = $(this);
+				$.ajax({
+					url: 'history'+param.method+','+param.from+','+param.to+','+param.step+','+param.path,
+					dataType: "json",
+					async: false,
+					cache: false,
+					error: function(a,b,c) {
+						alert(a+b+c);
+						return {'res':[]};
+					},
+					success: function(res) {
+						ret = res;
+					}
+				});
+				return ret;
 			}
 	};
 

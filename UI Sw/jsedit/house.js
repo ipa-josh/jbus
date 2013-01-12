@@ -3,7 +3,8 @@ gl_editor_temp['house'] = {
 		this.prototype = gl_editor_temp['default'];
 		this.prototype.init($this, {droppable: true} );
 	},
-	vis: function() {
-		
+	vis: function() {	
+	},
+	edit: function($this, vis) {
 	}
 }

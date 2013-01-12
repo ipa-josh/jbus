@@ -2,6 +2,13 @@
 
 <visualization>
 
+	<__time>
+		<pos>
+			<x>10</x>
+			<y>341</y>
+		</pos>
+	</__time>
+
 	<room>
 		<pos>
 			<x>0</x>

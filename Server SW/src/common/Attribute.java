@@ -3,6 +3,8 @@ package common;
 import java.util.Calendar;
 import java.util.Vector;
 
+import javax.swing.text.ChangedCharSetException;
+
 import org.jdom2.*;
 import rights.Group;
 import rights.Right;
@@ -51,14 +53,33 @@ public abstract class Attribute extends Right {
 			Object o = _get(usr);
 			if(!_set(usr,v))
 				return false;
+			else
+				changed();
 
-			if(!notifier_.notify(this)) {
+			int n = notifier_.notify(this);
+			if(n>=0) {
 				_set(usr, o);
-				notifier_.notify(this);
+				notifier_.notify(this, n);
 			}
 			
 			return true;
 		}
+	}
+	
+	public void changed() {
+		ts_change_=Calendar.getInstance().getTimeInMillis();
+		if(parent_!=null)
+			parent_.changedSubs();
+	}
+	
+	public void changedSubs() {
+		ts_change_subs_=Math.max(ts_change_subs_, Calendar.getInstance().getTimeInMillis());
+		if(parent_!=null)
+			parent_.changedSubs();
+	}
+	
+	public long getLastChanged() {
+		return ts_change_;
 	}
 
 	public Notifier getNotifier() {
@@ -82,7 +103,9 @@ public abstract class Attribute extends Right {
 	}
 
 	public void setId(String id) {
+		ConnectionInst.get().notifyRemove(this);
 		id_=id;
+		ConnectionInst.get().notifyCreation(this);
 	}
 
 	public String getVisualization() {
@@ -107,7 +130,12 @@ public abstract class Attribute extends Right {
 		if(t!=null)
 			visualization_ = t.getValue();
 		
-		return _readXML(el);
+		if(_readXML(el)) {
+			ConnectionInst.get().notifyCreation(this);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	protected Vector<Attribute> _getUpdate(User usr, long ts) {
