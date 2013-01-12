@@ -1,8 +1,5 @@
 package HWDriver.JBUS;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import HWDriver.JBUS.JBusInterface.Message;
 
 public interface JBusHW {
@@ -14,4 +11,6 @@ public interface JBusHW {
 	void sendMessage(Message msg) throws Exception;
 	Message getMessage() throws Exception;
 	int getStatus();
+	int getLastId();
+	void clear();
 }
