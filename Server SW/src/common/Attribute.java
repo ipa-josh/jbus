@@ -103,6 +103,11 @@ public abstract class Attribute extends Right {
 	}
 
 	public void setId(String id) {
+		if(id==getId()) return;
+		_setId(id);
+	}
+
+	protected void _setId(String id) {
 		ConnectionInst.get().notifyRemove(this);
 		id_=id;
 		ConnectionInst.get().notifyCreation(this);
@@ -124,7 +129,7 @@ public abstract class Attribute extends Right {
 			Output.error("missing id for Attribute");
 			return false;
 		}
-		id_ = t.getValue();
+		setId( t.getValue() );
 		
 		t=el.getAttribute("visualization");
 		if(t!=null)
@@ -142,6 +147,10 @@ public abstract class Attribute extends Right {
 		Vector<Attribute> l = new Vector<Attribute>();
 		l.add(this);
 		return l;
+	}
+	
+	public void onRemove() {
+		ConnectionInst.get().notifyRemove(this);
 	}
 
 	protected Object _get(User usr, Object v) {return null;}

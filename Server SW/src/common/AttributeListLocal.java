@@ -6,6 +6,7 @@ import HWDriver.COMMAND.Editor;
 import HWDriver.CONVERTER.Temperature;
 import HWDriver.JBUS.JBusInterface;
 import HWDriver.LOGIC.AND;
+import HWDriver.LOGIC.Delay;
 import HWDriver.LOGIC.OR;
 import HWDriver.SUNSET.Sunset;
 import HWDriver.SUNSET.Time;
@@ -17,7 +18,7 @@ public class AttributeListLocal implements AttributeList {
 
 	@Override
 	public Class[] getList() {
-		return new Class [] {HAObject.class, Attr_Boolean.class, Attr_Integer.class, Attr_String.class, AvrNetIoBoard.class, Sunset.class, Time.class, AND.class, OR.class, JBusInterface.class, Temperature.class, Command.class, Editor.class};
+		return new Class [] {HAObject.class, Attr_Boolean.class, Attr_Integer.class, Attr_String.class, AvrNetIoBoard.class, Sunset.class, Time.class, AND.class, OR.class, JBusInterface.class, Temperature.class, Command.class, Editor.class, Delay.class};
 	}
 
 }

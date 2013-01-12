@@ -104,7 +104,7 @@ if(!on_new_element) var on_new_element = function() {};
 				return this.each(function(){
 					var $this = $(this)
 					$.ajax({
-						url: 'set'+data.path,
+						url: 'set'+$this.data('path')+"/"+data,
 						dataType: "json",
 						error: function(a,b,c) {
 							error_handler.error("communication","could not set data");
