@@ -126,6 +126,25 @@ if(!on_new_element) var on_new_element = function() {};
 					});
 				});
 
+			},
+
+			history:  function(param) {
+				var ret;
+				var $this = $(this);
+				$.ajax({
+					url: 'history'+param.method+','+param.from+','+param.to+','+param.step+','+param.path,
+					dataType: "json",
+					async: false,
+					cache: false,
+					error: function(a,b,c) {
+						alert(a+b+c);
+						return {'res':[]};
+					},
+					success: function(res) {
+						ret = res;
+					}
+				});
+				return ret;
 			}
 	};
 
