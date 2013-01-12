@@ -23,6 +23,16 @@ public class HAMain {
 		
 		Command.sFn_ = fn;
 		
+		if(args.length>=2) {
+			try {
+				Thread.sleep( Long.parseLong(args[1]) );
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		HARoot root = new HARoot();
 		try {
 			root.readXML( (new SAXBuilder()).build( new File(fn) ).getRootElement() );
