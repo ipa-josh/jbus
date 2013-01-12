@@ -8,7 +8,7 @@ gl_vis_temp['light'] = {
 		
 		$this.click(
 				function() {
-					var v=$this.JHA('getChild',{name:"status"}).data('data')
+					var v=$this.JHA('getChild',{name:"status"}).data('data');
 					if(v==false||v=="false")
 						v=true;
 					else
