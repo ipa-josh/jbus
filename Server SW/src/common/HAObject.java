@@ -129,12 +129,14 @@ public class HAObject extends Attribute {
 							Constructor<? extends Attribute> constructor = list[j].getConstructor(new Class[] {User.class, Group.class, Attribute.class});
 							Attribute temp = constructor.newInstance(new Object[] {getUser(),getGroup(), this});
 
+							list_.add(temp);
+							
 							if(!temp.readXML(sub)) {
+								temp.onRemove();
+								list_.remove(temp);
 								Output.error("Failed to load "+sub.getName());
 								return false;
 							}
-
-							list_.add(temp);
 
 							found=true;
 							break;
@@ -236,6 +238,12 @@ public class HAObject extends Attribute {
 				return true;
 			}
 		return false;
+	}
+
+	protected void _setId(String id) {
+		super._setId(id);
+		for(int i=0; i<list_.size(); i++)
+			list_.get(i)._setId(list_.get(i).getId());
 	}
 
 }
