@@ -1,6 +1,8 @@
 
 var editor_intf = {
 
+	obj: null,
+
 	add: function(path, xml) {
 	},
 
@@ -13,6 +15,23 @@ var editor_intf = {
 		var list=["background-elements","user-interfaces","hardware"];
 		
 		$("#"+list[cat]).append('<li>'+entry+'</li>').listview('refresh');
+	},
+	
+	listImages: function() {
+		editor_intf.obj.JHA('set', 'list_images/true');
+		
+		var r;
+		while( true ) {
+			r = jQuery.parseJSON( editor_intf.obj.JHA('getChild',{name:'response'}).data('data') );
+			if(r!=undefined && 'imgs' in r)
+				break;
+		}
+		
+		return r.imgs;
+	},
+	
+	active: function() {
+		editor_intf.obj.JHA('set', 'active/true');
 	}
 	
 };
@@ -33,7 +52,7 @@ var gl_editor_temp={};
 			success: function(data) {
 			},
 			error: function(a,b,c) {
-				alert("e1: "+a+b+c);
+				alert("could not load vis for "+name);
 			}
 		});
 
