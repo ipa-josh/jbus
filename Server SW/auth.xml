@@ -10,4 +10,10 @@
 		<password>a9993e364706816aba3e25717850c26c9cd0d89d</password>
 		<group>ui</group>
 	</user>
+	<user>
+		<user>admin</user>
+		<password>a9993e364706816aba3e25717850c26c9cd0d89d</password>
+		<group>ui</group>
+		<group>hw</group>
+	</user>
 </authentification>
