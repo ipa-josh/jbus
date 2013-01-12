@@ -91,7 +91,7 @@ public class LogSqLite implements Callback {
 		}).complete();
 	}
 
-	public Vector<String> queryex(final Attribute attr, final User usr, final long _from_secs, final long _to_secs, final boolean avg) {
+	public Vector<String> queryex(final Attribute attr, final User usr, final long _from_secs, final long _to_secs, final long interval, final boolean avg) {
 		if(!attr.canRead(usr))
 			return new Vector<String>();
 		
@@ -102,7 +102,7 @@ public class LogSqLite implements Callback {
 				double from_secs = _from_secs/(24.*3600.);
 				double to_secs   = _to_secs/(24.*3600.);
 				
-			    SQLiteStatement st = connection.prepare("SELECT "+(avg?"AVG(CAST(data AS Float)), AVG(utime)":"data, utime")+" FROM history WHERE id=? AND utime BETWEEN (julianday('"+fmt.format(new Date())+"')"+(from_secs>=0?"+":"")+from_secs+") AND (julianday('"+fmt.format(new Date())+"')"+(to_secs>=0?"+":"")+to_secs+")");
+			    SQLiteStatement st = connection.prepare("SELECT "+(avg?"AVG(CAST(data AS Float)), AVG(utime), round(utime*"+(86400./interval)+") AS inter":"data, utime")+" FROM history WHERE id=? AND utime BETWEEN (julianday('"+fmt.format(new Date())+"')"+(from_secs>=0?"+":"")+from_secs+") AND (julianday('"+fmt.format(new Date())+"')"+(to_secs>=0?"+":"")+to_secs+")"+(avg?" GROUP BY INTER":""));
 			    st.bind(1, attr.getAbsoluteId());
 			    
 				Vector<String> r = new Vector<String>();
