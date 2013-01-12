@@ -107,21 +107,6 @@ if(!on_new_element) var on_new_element = function() {};
 						},
 						success: function(res) {
 							error_handler.clear("communication");
-
-							if(res) {
-								/*alert(data.path);
-								for(v in data.reload)
-									alert(data.reload[v]);*/
-								/*for(v in data.reload) {
-									alert(data.reload[v]);
-									$("#"+map[data.reload[v]]).JHA({
-										path: $("#"+map[data.reload[v]]).data("path"),
-										sync: true
-									});
-								}
-								$this.JHAVis('update')*/
-							}
-
 						}
 					});
 				});
