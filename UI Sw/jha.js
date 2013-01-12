@@ -73,7 +73,7 @@ if(!on_new_element) var on_new_element = function() {};
 					$(this).append("<div id='"+id+"' style='position:absolute'/>");
 					map[data.path] = id;
 					//alert(data.path);
-					$("#"+id).JHA(data)
+					$("#"+id).JHA(data);
 				});
 			},
 
@@ -85,6 +85,10 @@ if(!on_new_element) var on_new_element = function() {};
 
 			getChild:  function(data) {
 				return $("#"+map[$(this).data('path')+"/"+data.name]);
+			},
+
+			getFromAbsPath:  function(path) {
+				return $("#"+map[path]);
 			},
 
 			getAllChildren:  function() {
