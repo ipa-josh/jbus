@@ -58,7 +58,7 @@ gl_vis_temp['history'] = {
 				var data=[];
 				var axis='y2';
 				if(a[1]=='avg') {
-					var data_ = $this.JHA('history',{method:a[1],from:-3600*24*32,to:0,path:a[0],step:7200}).res; //~1 month
+					var data_ = $this.JHA('history',{method:a[1],from:-3600*24*32,to:0,path:a[0],step:1800}).res; //~1 month
 					var old;
 					for(var i=0; i<data_.length; i+=2) {
 						if(data_[i]!='null') {
