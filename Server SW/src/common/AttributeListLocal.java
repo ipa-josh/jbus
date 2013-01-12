@@ -6,6 +6,7 @@ import HWDriver.COMMAND.Editor;
 import HWDriver.CONVERTER.Temperature;
 import HWDriver.JBUS.JBusInterface;
 import HWDriver.LOGIC.AND;
+import HWDriver.LOGIC.Delay;
 import HWDriver.LOGIC.OR;
 import HWDriver.SUNSET.Sunset;
 import HWDriver.SUNSET.Time;
