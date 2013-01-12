@@ -8,11 +8,13 @@ import jibble.simplewebserver.SimpleWebServer;
 import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 import rights.Right;
+import web.History;
 import web.LookUp;
 import web.Setter;
 import web.VisJQuery;
 import web.VisUpdater;
 import common.CallbackInst;
+import common.ConnectionInst;
 import common.HAObject;
 import common.Output;
 
@@ -79,6 +81,7 @@ public class HARoot extends HAObject {
 			server.addHandle(new Setter(this));
 			server.addHandle(new VisJQuery(new File(visxml)));
 			server.addHandle(visup);
+			server.addHandle(new History(history, this));
 		} catch (IOException e) {
 			Output.error(e);
 		}
