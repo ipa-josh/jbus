@@ -1,5 +1,4 @@
 if(!on_new_element) var on_new_element = function() {};
-var history;
 
 (function( $ ) {
 	var id=0;
@@ -40,9 +39,7 @@ var history;
 		if(data.subs) { //container
 			$this.data("subs",data.subs)
 			for(s in data.subs) {
-				var d=$this.data("path")+"/"+data.subs[s];
-				if(!(d in map))
-					$this.JHA('add',{path:d});
+				$this.JHA('add',{path:$this.data("path")+"/"+data.subs[s]});
 			}
 		}
 		if(data.base=="data") {
@@ -105,9 +102,9 @@ var history;
 
 			set:  function(data) {
 				return this.each(function(){
-					var $this = $(this);
+					var $this = $(this)
 					$.ajax({
-						url: 'set'+$this.data('path')+'/'+encodeURI(data),
+						url: 'set'+data.path,
 						dataType: "json",
 						error: function(a,b,c) {
 							error_handler.error("communication","could not set data");
