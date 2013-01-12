@@ -247,7 +247,6 @@ public class JBusNode extends HAObject implements Callback {
 		p.setAttribute();
 		Attribute obj = (Attribute) get(getUser(), p);
 		double v = analog_[ch]/1023.;
-		System.out.println("setting analog object ("+ch+") to "+v);
 		if(obj!=null)
 			obj.set(getUser(), new Double(v));
 		else
