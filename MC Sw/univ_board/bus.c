@@ -18,7 +18,6 @@ void setTimeJB(unsigned char t)
 #define INACTIVE_TIMER() {TIMSK &= ~(1<<TOIE1);/*softuart_enable();*/}
 
 
-#define TIMER_INTERRUPT TIM1_OVF_vect
 
 #ifdef __AVR_ATtiny48__
 
@@ -35,14 +34,17 @@ void setTimeJB(unsigned char t)
 #define GIMSK PCICR
 #define EN_INT (1<<PCIE2)
 #define TIFR TIFR0
-#define TOIE TOIE0
+//#define TOIE TOIE0
+#define TOIE OCIE0A
 #define TIMSK TIMSK0
 #define RESET_TIMER ((1<<OCF0B)|(1<<OCF0A)|(1<<TOV0))
-#define PRESCALER ((1<<CS01)|(1<<CS00))	//64
-//#define PRESCALER (1<<CS01)	//8
+//#define PRESCALER ((1<<CS01)|(1<<CS00)|(1<<CTC0))	//64 with CTC
+#define PRESCALER ((1<<CS01)|(1<<CTC0))	//8 with CTC
 #define TCNT TCNT0
+#define OCR OCR0A
 
-#define TIM1_OVF_vect TIMER0_OVF_vect
+//#define TIM1_OVF_vect TIMER0_OVF_vect
+#define TIM1_OVF_vect TIMER0_COMPA_vect
 
 #elif defined(_CENTRAL)
 a
@@ -63,9 +65,6 @@ b
 #define PIN_MSK PCMSK1
 #define TCCR0A TCCR0A
 #define GIMSK EIMSK
-
-#undef TIMER_INTERRUPT
-#define TIMER_INTERRUPT TIMER1_OVF_vect
 
 #else
 
@@ -99,8 +98,9 @@ void jbus_init() {
 	//OCR1A = 0;
 	TCCR1 = PRESCALER;//|(1<<CTC1); // Prescaler 64
 	//TCCR0B = 3; // Prescaler 64 
+	OCR = TIME_0;
 
-	//ACTIVE_TIMER();
+	ACTIVE_TIMER();
 
 	PPORT&=~(1<<PIN);	//no pullup, output low
 	PIN_MSK |= (1<<PIN);	//enable int. on pin
@@ -121,11 +121,11 @@ char jbus_sending() {
 }
 
 char jbus_can_send() {
-	return ( (meta&0x40)==0 && PPIN);
+	return ( (meta&0xc0)==0 && PPIN);
 }		
 
 void jbus_sendW(volatile const u8 l) {
-	while(!PPIN) ;
+	while(!jbus_can_send()) ;
 	/*#ifndef EN_UART
 	_delay_us(300);
 	#endif*/
@@ -145,23 +145,28 @@ void jbus_sendI(volatile const u8 l) {
 }	
 
 void jbus_send(volatile const u8 l) {
-	if( (meta&0x40)==0 && PPIN) {
+	if( (meta&0xc0)==0 && PPIN) {
 		meta=0x80;
 		off=0xfe;
 		len=l;
-  		TCNT = 200; //start sending fast
-		ACTIVE_TIMER();
+  		//TCNT = 200; //start sending fast
+		//ACTIVE_TIMER();
 	}
 	else {
 		meta|=0x10;
+		#ifndef EN_UART
 		jbus_on_failure(data,len);
+		#else
+		jbus_on_failure_send(data,len);
+		#endif
 	}
 }
 
 ISR (PIN_VEC)
 {
 	if( (meta&0xc0)==0 && !PPIN) {
-		TCNT = 256-(TIME_0/2);
+		//TCNT = 256-(TIME_0/2);
+		TCNT = (TIME_0/2);
 		meta=0x40;
 		len=0xfe;
 		ACTIVE_TIMER();
@@ -171,12 +176,17 @@ ISR (PIN_VEC)
 			PDDR&=~(1<<PIN);
 			if( (meta&0xc0)==0x80) {
 				meta=0x10;
+				#ifndef EN_UART
 				jbus_on_failure(data,len);
+				#else
+				jbus_on_failure_send(data,len);
+				#endif
 			}
 		}
 	}
 	else if((meta&0xc0)==0x40 ) {
-		TCNT = 256-TIME_0/2;
+		//TCNT = 256-TIME_0/2;
+		TCNT = TIME_0/2;
 	}
 }
 
@@ -192,11 +202,11 @@ void jb1() {
 
 ISR (TIM1_OVF_vect)
 {
-  	TCNT = 256-TIME_0;
+  	//TCNT = 256-TIME_0;
 
 	if( (meta&0xc0)==0x40 ) {
 
-		if(len>250) {
+		if(len>=sizeof(data)*8) {
 			if( PPIN ) goto failure;
 			++len;
 		}
@@ -269,22 +279,26 @@ ISR (TIM1_OVF_vect)
 		GIMSK  |= EN_INT;
 
 	}
-	else
-		INACTIVE_TIMER();
+	//else
+	//	INACTIVE_TIMER();
 
 	return;
 
 done:
 	meta=0;
 	
+	GIMSK  &= ~EN_INT;
 	jbus_on_receive(data,len);
+	GIMSK  |= EN_INT;
 
 	return;
 
 failure:
 	meta=0;
 	
+	GIMSK  &= ~EN_INT;
 	jbus_on_failure(data,len);
+	GIMSK  |= EN_INT;
 
 	return;
 }

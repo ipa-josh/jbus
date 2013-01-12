@@ -188,9 +188,12 @@ void periodic() {
 			buffer[(off>>3)]=cdata;
 			off+=8;
 			if(off>=len) {
+				while(!jbus_can_send()) ;
+				cli();
 				for(i=0; i<(off>>3); i++)
 					data[i] = buffer[i];
 				jbus_send(len);
+				sei();
 				
 				off=len=0;
 			}
@@ -243,6 +246,7 @@ void periodic() {
 	}
 	
 	if(send!=0) {
+		
 		while(!jbus_can_send()); //wait till can send
 		
 		cli();
@@ -274,6 +278,14 @@ void jbus_on_done(volatile u8 *data, volatile u8 len) {
 void jbus_on_failure(volatile u8 *data, volatile u8 len) {
 	#ifdef EN_UART
 	ToHost_Transmit_Byte(RECV_FAILED);
+	#else
+	#endif
+}
+
+//called on unsucessful send
+void jbus_on_failure_send(volatile u8 *data, volatile u8 len) {
+	#ifdef EN_UART
+	ToHost_Transmit_Byte(SEND_FAILED);
 	#else
 	#endif
 }
@@ -323,11 +335,11 @@ void jbus_on_receive(volatile u8 *data, volatile u8 len) {
 				
 			case CONFIG<<6:	//read/write firmware
 				if(len==8+8*CONFIG_SIZE) {
-					eeprom_write_block (data, ee_configuration, CONFIG_SIZE);
+					eeprom_write_block ( (data+1), ee_configuration, CONFIG_SIZE);
 					load_config();
 				}
 				else if(len==8) {
-					for(i=0; i<sizeof(configuration); i++)
+					for(i=1; i<sizeof(configuration); i++)
 						data[i] = configuration[i];
 					jbus_sendI(8*sizeof(configuration));
 				}				
