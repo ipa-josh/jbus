@@ -35,15 +35,15 @@ public class Attr_Double extends Attribute {
 			t=(Long)v;
 		}
 		else if(String.class.equals(v.getClass())) {
-			t=Long.parseLong((String)v);
+			t=Double.parseDouble((String)v);
 		}
 		else
 			return false;
+		
 		if(t==val_)
 			return false;
 		val_ = t;
 
-		ts_change_=Calendar.getInstance().getTimeInMillis();
 		return true;
 	}
 

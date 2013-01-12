@@ -37,7 +37,6 @@ public class Attr_Integer extends Attribute {
 			return false;
 		val_ = t;
 
-		ts_change_=Calendar.getInstance().getTimeInMillis();
 		return true;
 	}
 

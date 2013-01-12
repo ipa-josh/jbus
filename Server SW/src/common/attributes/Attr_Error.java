@@ -20,9 +20,9 @@ public class Attr_Error extends Attribute {
 		STATUS(String str) {s=str;}
 		
 		public static STATUS toSTATUS(String s) {
-			if(s.equals(OK))
+			if(s.equals("OK"))
 				return OK;
-			if(s.equals(WARNING))
+			if(s.equals("WARNING"))
 				return WARNING;
 			return ERROR;
 		}
@@ -78,7 +78,6 @@ public class Attr_Error extends Attribute {
 		status_ = status;
 		descr_  = descr;
 
-		ts_change_=Calendar.getInstance().getTimeInMillis();
 		return true;
 	}
 

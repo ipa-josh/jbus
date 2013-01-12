@@ -9,7 +9,7 @@ import rights.User;
 import common.Attribute;
 
 public class Attr_String extends Attribute {
-	String val_;
+	String val_ = "";
 
 	public Attr_String(User usr, Group grp, Attribute parent) {
 		super(usr, grp, parent);
@@ -26,13 +26,12 @@ public class Attr_String extends Attribute {
 			return false;
 		val_ = t;
 
-		ts_change_=Calendar.getInstance().getTimeInMillis();
 		return true;
 	}
 
 	@Override
 	protected Object _get(User usr) {
-		return new Long(val_);
+		return new String(val_);
 	}
 	
 	public boolean _readXML(Element el) {
