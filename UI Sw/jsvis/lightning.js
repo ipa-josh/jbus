@@ -4,10 +4,9 @@ gl_vis_temp['lightning'] = {
 	},
 	vis: function($this, vis) {
 		var v=$this.JHA('getChild',{name:"status"}).data('data')
-		
 		var n = Math.round(Math.abs(v)*255);
 		var col=n.toString(16)+n.toString(16)+"00";
-		$this.find(".dark-light").style('background-color',"#"+col);
+		$this.find(".dark-light").css('background-color',"#"+col);
 	},
 	edit: function($this, vis) {
 	}
