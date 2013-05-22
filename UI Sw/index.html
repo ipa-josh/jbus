@@ -3,28 +3,85 @@
 	<head> 
 	<title>JHA</title> 
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<link rel="stylesheet" href="css/jquery.mobile-1.2.0.min.css" />
+	<!--link rel="stylesheet" href="css/jquery.mobile-1.2.0.min.css" /-->
+	<link rel="stylesheet"  href="http://jquerymobile.com/demos/1.3.0-beta.1/css/themes/default/jquery.mobile-1.3.0-beta.1.css">
 	<link rel="stylesheet" href="css/thermometer.css" />
 	
 	<script src="dep/jquery-1.7.1.min.js"></script>
-	<script src="dep/jquery.mobile-1.2.0.min.js"></script>
+	<!--script src="dep/jquery.mobile-1.2.0.min.js"></script-->
+	<script src="http://jquerymobile.com/demos/1.3.0-beta.1/js/jquery.mobile-1.3.0-beta.1.js"></script>
 	<script src="dep/jquery.nicescroll.js"></script>
 	<script src="error_handler.js"></script>
 	
 	<script src="jha.js"></script>
 	<script src="vis.js"></script>
+
+<style>
+    /* 1st breakpoint - Float B and C, leave A full width on top */ 
+	@media all and (min-width: 34em){
+        div {
+           min-height:12em;
+        }
+		.ui-block-b, 
+		.ui-block-c { 
+		  float:left; 
+          width: 49.95%; 
+		}
+        .ui-block-b p, 
+		.ui-block-c p { 
+          font-size:.8em;
+
+		}
+	}
+
+    /* 2nd breakpoint - Float all, 50/25/25 */ 
+	@media all and (min-width: 46em){
+
+        div {
+           min-height:17em;
+        }
+		.ui-block-c { 
+		  float:left; 
+          width: 49.95%; 
+		}
+		.ui-block-b, 
+		.ui-block-c { 
+		  float:left; 
+          width: 49.95%; 
+		}
+	}
+
+    /* 3rd breakpoint - Bump up font size at very wide screens */ 
+	@media all and (min-width: 66em){
+		.ui-block-c { 
+		  float:left; 
+          width: 49.95%; 
+		}
+		.ui-block-b, 
+		.ui-block-c { 
+		  float:left; 
+          width: 49.95%; 
+		}
+	}
+	</style>
 </head> 
 <body> 
 
 <div data-role="page" id="main" style="position:absolute">
 
-	<div data-role="header" id="header" style="z-index:1000;">
+<!-- secondary story block #1 -->
+<div class="ui-block-b">
+	<div class="ui-body ui-body-d">
 		<a href="#error_dialog" data-rel="popup" id="status" style="float:left;padding:5px;width:23px;height:23px;"></a>
 		<h1 id="title" style="height:25px">Josh's Home Automation</h1>
-	</div><!-- /header -->
-
-	<div id="content" style="width:100%;height:100%;position:absolute;top:41px">	
-	</div><!-- /content -->
+	</div>
+</div>
+	
+<!-- secondary story block #2 -->
+<div id="content" class="ui-block-c">
+	<div class="ui-body ui-body-d">
+	</div>
+</div>
 
 <div data-role="popup" id="error_dialog" style="z-index:2001;">
 			<div data-role="collapsible-set" data-theme="b" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" style="z-index:2001;margin:0; width:500px;">
