@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# AvrStudio Solution File, Format Version 11.00
+Project("{D1100916-62DA-4D80-A9B4-55A1E7CCEEB3}") = "gateway_jbus2serial", "gateway_jbus2serial.avrgccproj", "{E365B7D4-DB83-4B8F-B542-BA260BCF0010}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		default|AVR = default|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E365B7D4-DB83-4B8F-B542-BA260BCF0010}.default|AVR.ActiveCfg = default|AVR
+		{E365B7D4-DB83-4B8F-B542-BA260BCF0010}.default|AVR.Build.0 = default|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
