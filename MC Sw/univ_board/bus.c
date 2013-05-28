@@ -14,7 +14,7 @@ void setTimeJB(unsigned char t)
 	TIME_0=t;
 }*/
 
-#define ACTIVE_TIMER() {TIFR|=RESET_TIMER;TIMSK |= (1<<TOIE);/*softuart_disable();*/}
+#define ACTIVE_TIMER() {TIFR=RESET_TIMER;TIMSK |= (1<<TOIE);/*softuart_disable();*/}
 #define INACTIVE_TIMER() {TIMSK &= ~(1<<TOIE1);/*softuart_enable();*/}
 
 
