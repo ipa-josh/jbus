@@ -1,6 +1,7 @@
 package HWDriver.JBUS;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.jdom2.DataConversionException;
 import org.jdom2.Element;
@@ -272,6 +273,12 @@ public class JBusInterface extends HAObject implements Runnable {
 				
 				if(Calendar.getInstance().getTimeInMillis()-status_.getLastChanged()>10*1000)
 					status_.setStatus(Right.getGlobalUser("ui"), STATUS.OK, "");
+				
+				//check for lost devices (timeout)
+				for(Entry<Integer, JBusNode> c : connections_.entrySet()) {
+					if(  Calendar.getInstance().getTimeInMillis()-c.getValue().getLastReceived() > 10*c.getValue().getPollingMs())
+						status_.setStatus(Right.getGlobalUser("ui"), STATUS.ERROR, "jbus node "+c.getKey()+" timed out");
+				}
 
 				Message msg;
 				try {
