@@ -86,6 +86,10 @@ public class JBusNode extends HAObject implements Callback {
 		return polling_ms_;
 	}
 
+	public long getLastReceived() {
+		return ts_last_received_;
+	}
+
 	public void setPollingMs(int v) {
 		polling_ms_ = v;
 	}
