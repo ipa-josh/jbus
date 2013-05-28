@@ -40,7 +40,17 @@ public class LogSqLite implements Callback {
 				return null;
 			}
 		});
+		
+		queue_.execute(new SQLiteJob<Object>() {
+			protected Object job(SQLiteConnection connection) throws SQLiteException {
+				connection.exec("create index if not exists history_idx ON history (id, utime)");
+				return null;
+			}
+		});
+		
 	}
+	
+	public static LogSqLite get() {return inst_;}
 
 	private void log(final Attribute attr, final Date utime, final User usr) {
 		synchronized (this) {
