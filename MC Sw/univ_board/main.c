@@ -30,7 +30,13 @@ void ToHost_Transmit_Byte( unsigned char data )
 }
 #else
 
+#ifdef CONFIG_ROLLO
+#define PIN_NUMBER_START	4
+#define PINS_NUMBER 6
+#else
+#define PIN_NUMBER_START	0
 #define PINS_NUMBER 10
+#endif
 #define CONFIG_SIZE (1+PINS_NUMBER/2)
 volatile uint8_t ee_configuration[CONFIG_SIZE+1] EEMEM = {};
 volatile uint8_t configuration[CONFIG_SIZE+1];
@@ -69,7 +75,14 @@ void load_config() {
 	
 	conf_output_portB = conf_output_portC = 0;
 	
-	for (i=0; i<PINS_NUMBER; i++)
+#ifdef CONFIG_ROLLO
+	DDRC  |= 0x0f;
+	PORTC &= ~(0x0f);
+	DDRB  &= ~(0x0f<<2); //input
+	PORTB |= (0x0f<<2); // pullup
+#endif	
+	
+	for (i=PIN_NUMBER_START; i<PINS_NUMBER; i++)
 	{
 		data = (configuration[1+i/2]>>(i&1?4:0))&0x0F;
 		
@@ -126,6 +139,10 @@ void init() {
 #ifdef EN_UART
 	softuart_init( );
 #else
+#ifdef CONFIG_ROLLO
+	TCCR1B = (1<<CS11);		//timer1 (16-bit) with pre-scaler of 8
+	TIMSK1 = TOIE1;			//enable overflow interrupt
+#endif
 	ADCSRA = (1<<ADEN)|(1<<ADPS2);            // enable ADC, prescaler 16
 	load_config();
 #endif
@@ -135,6 +152,54 @@ void init() {
 }
 
 extern volatile u8 data[16];
+
+#ifdef CONFIG_ROLLO
+inline void motor_Up(uint8_t m) {
+	PORTC = 1<<(2*m) | (PORTC&0xf0);
+}
+inline void motor_Down(uint8_t m) {
+	PORTC = 2<<(2*m) | (PORTC&0xf0);
+}
+inline uint8_t motor_isUp(uint8_t m) {
+	return PORTC & (1<<(2*m));
+}
+inline uint8_t motor_isDown(uint8_t m) {
+	return PORTC & (2<<(2*m));
+}
+inline void motor_Stop(uint8_t m) {
+	PORTC &= 0xf0;
+}
+inline uint8_t is_Up(uint8_t m) {
+	return PORTB&(1<<(2*m));
+}
+inline uint8_t is_Down(uint8_t m) {
+	return PORTB&(2<<(2*m));
+}
+static volatile uint16_t counter_rollo;
+static uint16_t time_to_reach[2] = {};
+inline void rollo_start(uint16_t start) {
+	counter_rollo = start;
+}
+inline uint16_t rollo_counter() {
+	return counter_rollo;
+}
+ISR(TIMER1_OVF_vect)
+{
+	if(counter_rollo)
+		--counter_rollo;
+}
+inline void rollo_set(uint8_t val) {
+	uint8_t m = val&0x80;
+	if( (val&0x3f)==0x3f )
+		rollo_start(0xffff);
+	else
+		rollo_start( (val&0x3f)*(uint32_t)time_to_reach[m]/64 );
+	if(val&0x40)
+		motor_Up(m);
+	else
+		motor_Down(m);
+}
+#endif
 
 void periodic() {
 #ifdef EN_UART
@@ -215,7 +280,33 @@ void periodic() {
 	uint8_t i=0, send=0;
 	uint16_t port = ((PINC&0x3F)|((PINB<<4)&0xC0))|(((PINB>>4)&0x03)<<8);
 	
-	for(i=0; i<PINS_NUMBER; i++) {
+#ifdef CONFIG_ROLLO
+	for(i=0; i<2; i++) {
+		if(time_to_reach[i]==0) {
+			motor_Up(i);
+			if(is_Up(i)) {
+				time_to_reach[i]=1;
+				rollo_start(0xffff); //start timer now
+			}				
+		}
+		else if(time_to_reach[i]==1) {
+			motor_Down(i);
+			if(is_Down(i)) {
+				motor_Stop(i);
+				time_to_reach[i] = 0xffff-rollo_counter();
+			}
+		}
+		else {
+			if(
+			(is_Down(i) && motor_isDown(i)) || 
+			(is_Up(i) && motor_isUp(i)) ||
+			!rollo_counter() )
+				motor_Stop(i);
+		}
+	}
+#endif
+	
+	for(i=PIN_NUMBER_START; i<PINS_NUMBER; i++) {
 		if( ((configuration[1+i/2]>>(i&1?4:0))&0x03)==PWM ) {
 			if(val_pwm[i]>=conf_pwm[i]) {
 				if(i<6)
@@ -324,7 +415,11 @@ void jbus_on_receive(volatile u8 *data, volatile u8 len) {
 			case WRITE<<6:	//write IOs
 				if(len==8+10) {	//simple output
 					PORTC = (PORTC&(~conf_output_portC))|(conf_output_portC&(data[1]));
+#ifdef CONFIG_ROLLO
+					rollo_set( (data[1]&0xcf)|( (data[2]&0x03)<<4 ) );
+#else
 					PORTB = (PORTB&(~conf_output_portB))|(conf_output_portB&( (data[1]>>4)|(data[2]<<4) ));
+#endif
 				}
 				else if(len==8+11) {//PWM
 					i = data[2]&0x07;
@@ -377,4 +472,3 @@ void jbus_on_receive(volatile u8 *data, volatile u8 len) {
 		jbus_sendI(6);
 #endif
 }
-
