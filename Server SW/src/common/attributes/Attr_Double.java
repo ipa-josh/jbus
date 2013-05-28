@@ -16,11 +16,7 @@ public class Attr_Double extends Attribute {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	protected boolean _set(User usr, Object v) {
-		if(v==null)
-			return false;
-
+	public static double toDouble(Object v) throws Exception {
 		double t;
 		if(Double.class.equals(v.getClass())) {
 			t=(Double)v;
@@ -37,9 +33,30 @@ public class Attr_Double extends Attribute {
 		else if(String.class.equals(v.getClass())) {
 			t=Double.parseDouble((String)v);
 		}
+		else if(Boolean.class.equals(v.getClass())) {
+			if( Boolean.parseBoolean((String)v) )
+				t=1;
+			else
+				t=0;
+		}
 		else
+			throw new Exception("unsupported");
+		return t;
+	}
+
+	@Override
+	protected boolean _set(User usr, Object v) {
+		if(v==null)
 			return false;
-		
+
+		double t;
+		try {
+			t = toDouble(v);
+		}
+		catch(Exception e) {
+			return false;
+		}
+
 		if(t==val_)
 			return false;
 		val_ = t;
@@ -51,7 +68,7 @@ public class Attr_Double extends Attribute {
 	protected Object _get(User usr) {
 		return new Double(val_);
 	}
-	
+
 	public boolean _readXML(Element el) {
 		val_ = Double.parseDouble(el.getValue());
 		return true;
