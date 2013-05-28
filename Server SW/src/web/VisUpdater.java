@@ -38,6 +38,8 @@ public class VisUpdater implements Callback, PathHandle {
 
 	@Override
 	public String onRequest(String url, User user) {
+		if(user==null || url==null) return "";
+		
 		long ts=0;
 		try {
 			ts = Long.parseLong(url.substring(getPath().length()));

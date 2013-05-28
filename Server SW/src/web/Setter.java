@@ -22,6 +22,8 @@ public class Setter implements PathHandle {
 
 	@Override
 	public String onRequest(String url, rights.User user) {
+		if(user==null || url==null) return "";
+		
 		PathWithData p = new PathWithData();
 		p.parseString(url.substring(getPath().length()));
 		p.fromPath();

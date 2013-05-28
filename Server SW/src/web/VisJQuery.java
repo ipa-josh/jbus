@@ -56,6 +56,8 @@ public class VisJQuery implements PathHandle {
 
 	@Override
 	public String onRequest(String url, rights.User user) {
+		if(user==null || url==null) return "";
+		
 		String key = url.substring(getPath().length());
 		if(jsons_.containsKey(key))
 			return jsons_.get(key);

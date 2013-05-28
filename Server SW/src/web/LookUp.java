@@ -33,6 +33,8 @@ public class LookUp implements PathHandle {
 
 	@Override
 	public String onRequest(String url, rights.User user) {
+		if(user==null || url==null) return "";
+		
 		Path p = new Path();
 		p.parseString(url.substring(getPath().length()));
 		
