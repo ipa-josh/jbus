@@ -99,6 +99,7 @@ public class RequestThread extends Thread {
 					sendAuth(out);
 					out.flush();
 					out.close();
+					return;
 				}
 			}
 			else
@@ -108,11 +109,15 @@ public class RequestThread extends Thread {
 			String path = request.substring(4, request.length() - 9);
 			for(int i=0; i<handles_.size(); i++) {
 				if(path.startsWith(handles_.get(i).getPath())) {
-					String send = handles_.get(i).onRequest(path, user);
+					try {
+						String send = handles_.get(i).onRequest(path, user);
 
-					sendHeader(out, 200, "application/json", send.getBytes().length, Calendar.getInstance().getTimeInMillis());
+						sendHeader(out, 200, "application/json", send.getBytes().length, Calendar.getInstance().getTimeInMillis());
 
-					out.write(send.getBytes());
+						out.write(send.getBytes());
+					} catch(Exception e) {
+						sendHeader(out, 404, "application/json", 0, Calendar.getInstance().getTimeInMillis());
+					}
 					done=true;
 					break;
 				}
