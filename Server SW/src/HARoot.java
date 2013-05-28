@@ -72,7 +72,7 @@ public class HARoot extends HAObject {
 		if(t!=null)
 			restore = true;
 			restore_ms = Integer.parseInt(t.getValue());
-		} catch(Exception e) {Output.error(e);}
+		} catch(Exception e) {Output.warning("restore not set");}
 		
 		try {
 			SimpleWebServer server = new SimpleWebServer(new File("../UI Sw"),port, new rights.Authentification(new File(auth)));
