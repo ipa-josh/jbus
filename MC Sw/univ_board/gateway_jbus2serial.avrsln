@@ -6,10 +6,16 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		default|AVR = default|AVR
+		rollo|AVR = rollo|AVR
+		uart|AVR = uart|AVR
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E365B7D4-DB83-4B8F-B542-BA260BCF0010}.default|AVR.ActiveCfg = default|AVR
 		{E365B7D4-DB83-4B8F-B542-BA260BCF0010}.default|AVR.Build.0 = default|AVR
+		{E365B7D4-DB83-4B8F-B542-BA260BCF0010}.rollo|AVR.ActiveCfg = rollo|AVR
+		{E365B7D4-DB83-4B8F-B542-BA260BCF0010}.rollo|AVR.Build.0 = rollo|AVR
+		{E365B7D4-DB83-4B8F-B542-BA260BCF0010}.uart|AVR.ActiveCfg = uart|AVR
+		{E365B7D4-DB83-4B8F-B542-BA260BCF0010}.uart|AVR.Build.0 = uart|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
